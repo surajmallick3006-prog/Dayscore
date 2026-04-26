@@ -82,6 +82,49 @@ const TimeTrackerPage = () => {
   useEffect(() => {
     loadSavedTimers();
     fetchTimeLogs();
+    
+    // Check for task context from TasksPage
+    const activeTaskData = sessionStorage.getItem('activeTask');
+    if (activeTaskData) {
+      try {
+        const taskInfo = JSON.parse(activeTaskData);
+        
+        // Determine session type based on task panel/category
+        let sessionType = 'study'; // default
+        if (taskInfo.panel === 'academic' || taskInfo.category === 'study') {
+          sessionType = 'study';
+        } else if (taskInfo.category === 'work') {
+          sessionType = 'work';
+        } else {
+          sessionType = 'study'; // default for personal tasks
+        }
+        
+        // Set active session type
+        setActiveSessionType(sessionType);
+        
+        // Set description with task title
+        setTimers(prev => ({
+          ...prev,
+          [sessionType]: {
+            ...prev[sessionType],
+            description: `Working on: ${taskInfo.title}`
+          }
+        }));
+        
+        // Show notification
+        toast.success(`🎯 Ready to track time for "${taskInfo.title}"`, {
+          duration: 4000,
+          icon: '🎯'
+        });
+        
+        // Clear the session storage
+        sessionStorage.removeItem('activeTask');
+        
+      } catch (error) {
+        console.error('Error parsing task context:', error);
+        sessionStorage.removeItem('activeTask');
+      }
+    }
   }, [fetchTimeLogs]);
 
   // Check for new day every minute (when component is active)
@@ -505,6 +548,20 @@ const TimeTrackerPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Session Type
             </label>
+            
+            {/* Task Context Indicator */}
+            {getCurrentTimer().description && getCurrentTimer().description.startsWith('Working on:') && (
+              <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <span className="text-blue-600">🎯</span>
+                  <div>
+                    <div className="text-sm font-medium text-blue-900">Task Context Active</div>
+                    <div className="text-xs text-blue-700">{getCurrentTimer().description}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="relative">
               <select
                 value={activeSessionType}

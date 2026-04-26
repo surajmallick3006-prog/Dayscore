@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import AIPopupManager from './components/AIPopupManager';
 import AIControls from './components/AIControls';
+import ChatBot from './components/ChatBot';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -23,6 +24,9 @@ import PhysicalActivityPage from './pages/PhysicalActivityPage';
 import MoodPage from './pages/MoodPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import ProfilePage from './pages/ProfilePage';
+import HoroscopePage from './pages/HoroscopePage';
+import VibePage from './pages/VibePage';
+import CommunityPage from './pages/CommunityPage';
 
 function App() {
   return (
@@ -79,6 +83,9 @@ function App() {
                   <Route path="physical-activity" element={<PhysicalActivityPage />} />
                   <Route path="mood" element={<MoodPage />} />
                   <Route path="analytics" element={<AnalyticsPage />} />
+                  <Route path="horoscope" element={<HoroscopePage />} />
+                  <Route path="vibes" element={<VibePage />} />
+                  <Route path="community" element={<CommunityPage />} />
                   <Route path="profile" element={<ProfilePage />} />
                 </Route>
                 
@@ -89,6 +96,7 @@ function App() {
               {/* AI Components - Only show in protected routes */}
               <AIPopupManager />
               <AIControls />
+              <ChatBot />
             </div>
           </Router>
         </AIProvider>

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   BarChart3, 
   CheckSquare, 
@@ -7,12 +7,65 @@ import {
   Heart, 
   Smile, 
   TrendingUp,
-  ArrowRight,
-  Star
+  ArrowRight
 } from 'lucide-react';
 import Logo from '../components/Logo';
+import { useServerAuth } from '../context/ServerAuthContext';
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated, loading } = useServerAuth();
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
+
+  // Auto-redirect authenticated users to dashboard, but only if they haven't interacted
+  useEffect(() => {
+    if (!loading && isAuthenticated && !hasUserInteracted) {
+      // Check if user came from dashboard (back button scenario)
+      const fromDashboard = location.state?.from?.includes('/app/');
+      
+      if (!fromDashboard) {
+        // Small delay to prevent flicker
+        const timer = setTimeout(() => {
+          navigate('/app/dashboard', { replace: true });
+        }, 100);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isAuthenticated, loading, navigate, hasUserInteracted, location.state]);
+
+  const handleGetStarted = (e) => {
+    e.preventDefault();
+    setHasUserInteracted(true);
+    if (isAuthenticated) {
+      navigate('/app/dashboard', { replace: true });
+    } else {
+      navigate('/register');
+    }
+  };
+
+  const handleStartTracking = (e) => {
+    e.preventDefault();
+    setHasUserInteracted(true);
+    if (isAuthenticated) {
+      navigate('/app/dashboard', { replace: true });
+    } else {
+      navigate('/login');
+    }
+  };
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="flex items-center space-x-4">
+          <Logo size={64} />
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
   const features = [
     {
       icon: BarChart3,
@@ -65,9 +118,6 @@ const LandingPage = () => {
 
         <div className="mx-auto max-w-4xl py-8 sm:py-12 lg:py-16">
           <div className="text-center">
-            {/* Global average badge */}
-            
-
             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
               Track Your Day.{' '}
               <span className="text-gradient bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
@@ -81,13 +131,13 @@ const LandingPage = () => {
             </p>
             
             <div className="mt-8 flex items-center justify-center gap-x-6">
-              <Link
-                to="/register"
+              <button
+                onClick={handleGetStarted}
                 className="bg-primary-500 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 rounded-lg transition-all duration-200 flex items-center space-x-2"
               >
                 <span>Get Started Free</span>
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </button>
               <Link
                 to="/login"
                 className="text-sm font-semibold leading-6 text-gray-300 hover:text-white transition-colors"
@@ -144,12 +194,12 @@ const LandingPage = () => {
             Join thousands of users who are already tracking and improving their daily productivity and wellness.
           </p>
           <div className="mt-8 flex items-center justify-center gap-x-6">
-            <Link
-              to="/register"
+            <button
+              onClick={handleStartTracking}
               className="bg-primary-500 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 rounded-lg transition-all duration-200"
             >
               Start tracking today
-            </Link>
+            </button>
           </div>
         </div>
       </div>

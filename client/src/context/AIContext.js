@@ -11,6 +11,7 @@ export const AIProvider = ({ children }) => {
   const [isRecoveryMode, setIsRecoveryMode] = useState(false);
   const [popupHistory, setPopupHistory] = useState([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [lastPopupTime, setLastPopupTime] = useState(0);
 
   const { user } = useServerAuth();
   const { 
@@ -26,6 +27,12 @@ export const AIProvider = ({ children }) => {
   useEffect(() => {
     const recoveryMode = aiService.getRecoveryMode();
     setIsRecoveryMode(recoveryMode);
+    
+    // Initialize last popup time from storage
+    const lastTime = localStorage.getItem('lastPopupTime');
+    if (lastTime) {
+      setLastPopupTime(parseInt(lastTime));
+    }
   }, []);
 
   // Build user context for AI analysis
@@ -82,6 +89,15 @@ export const AIProvider = ({ children }) => {
   const analyzeAndShowPopup = useCallback(async (trigger = 'auto') => {
     if (!user || isAnalyzing) return;
 
+    // Check cooldown period (minimum 10 minutes between popups)
+    const now = Date.now();
+    const cooldownPeriod = 10 * 60 * 1000; // 10 minutes
+    
+    if (trigger === 'auto' && (now - lastPopupTime) < cooldownPeriod) {
+      console.log('🚫 AI Popup: Still in cooldown period');
+      return;
+    }
+
     const context = buildUserContext();
     if (!context) return;
 
@@ -104,6 +120,8 @@ export const AIProvider = ({ children }) => {
       if (popup) {
         setCurrentPopup(popup);
         setPopupHistory(prev => [popup, ...prev.slice(0, 9)]); // Keep last 10
+        setLastPopupTime(now);
+        localStorage.setItem('lastPopupTime', now.toString());
         
         console.log('✨ AI Popup generated:', popup);
       }
@@ -113,7 +131,7 @@ export const AIProvider = ({ children }) => {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [user, buildUserContext, isAnalyzing]);
+  }, [user, buildUserContext, isAnalyzing, lastPopupTime]);
 
   // Handle popup actions
   const handlePopupAction = useCallback((popup) => {
@@ -155,6 +173,15 @@ export const AIProvider = ({ children }) => {
     }
   }, []);
 
+  // Disable AI popups completely
+  const disableAIPopups = useCallback((hours = 24) => {
+    aiService.temporarilyDisable(hours * 60);
+    toast.success(`AI popups disabled for ${hours} hours`, {
+      duration: 4000,
+      icon: '🔇'
+    });
+  }, []);
+
   // Close current popup
   const closePopup = useCallback(() => {
     setCurrentPopup(null);
@@ -171,47 +198,69 @@ export const AIProvider = ({ children }) => {
     return await aiService.getPopupAnalytics(user.id);
   }, [user]);
 
-  // Auto-trigger on significant events
+  // Auto-trigger on significant events (debounced)
   useEffect(() => {
     if (!user) return;
 
-    // Trigger on task completion
+    // Debounce task completion triggers
     const completedCount = tasks.filter(t => t.completed).length;
     if (completedCount > 0) {
-      const timer = setTimeout(() => analyzeAndShowPopup('task_complete'), 2000);
+      const timer = setTimeout(() => {
+        // Only trigger if no recent popup
+        const now = Date.now();
+        if ((now - lastPopupTime) > 5 * 60 * 1000) { // 5 min minimum
+          analyzeAndShowPopup('task_complete');
+        }
+      }, 5000); // 5 second delay
       return () => clearTimeout(timer);
     }
-  }, [tasks, user, analyzeAndShowPopup]);
+  }, [tasks.filter(t => t.completed).length, user, analyzeAndShowPopup, lastPopupTime]); // Only trigger on completion count change
 
-  // Auto-trigger on day score changes
+  // Auto-trigger on significant day score changes (debounced)
   useEffect(() => {
-    if (!user || !dayScore) return;
+    if (!user || !dayScore?.score) return;
 
-    const timer = setTimeout(() => analyzeAndShowPopup('score_update'), 3000);
-    return () => clearTimeout(timer);
-  }, [dayScore?.score, user, analyzeAndShowPopup]);
+    // Only trigger on significant score changes (>10 points)
+    const currentScore = dayScore.score;
+    const lastScore = localStorage.getItem('lastDayScore');
+    
+    if (lastScore && Math.abs(currentScore - parseInt(lastScore)) > 10) {
+      const timer = setTimeout(() => {
+        const now = Date.now();
+        if ((now - lastPopupTime) > 10 * 60 * 1000) { // 10 min minimum for score changes
+          analyzeAndShowPopup('score_update');
+        }
+      }, 8000); // 8 second delay
+      
+      localStorage.setItem('lastDayScore', currentScore.toString());
+      return () => clearTimeout(timer);
+    } else if (!lastScore) {
+      localStorage.setItem('lastDayScore', currentScore.toString());
+    }
+  }, [dayScore?.score, user, analyzeAndShowPopup, lastPopupTime]);
 
-  // Periodic check (every 30 minutes during active use)
+  // Periodic check (every 2 hours during active use, not 30 minutes)
   useEffect(() => {
     if (!user) return;
 
     const interval = setInterval(() => {
-      // Only trigger if user has been active (check for recent data updates)
+      // Only trigger if user has been active and no recent popup
       const lastActivity = Math.max(
         new Date(dayScore?.updatedAt || 0).getTime(),
         new Date(tasks[0]?.updatedAt || 0).getTime(),
         new Date(timeLogs[0]?.createdAt || 0).getTime()
       );
 
-      const thirtyMinutesAgo = Date.now() - (30 * 60 * 1000);
+      const twoHoursAgo = Date.now() - (2 * 60 * 60 * 1000);
+      const now = Date.now();
       
-      if (lastActivity > thirtyMinutesAgo) {
+      if (lastActivity > twoHoursAgo && (now - lastPopupTime) > 2 * 60 * 60 * 1000) {
         analyzeAndShowPopup('periodic');
       }
-    }, 30 * 60 * 1000); // 30 minutes
+    }, 2 * 60 * 60 * 1000); // 2 hours
 
     return () => clearInterval(interval);
-  }, [user, dayScore, tasks, timeLogs, analyzeAndShowPopup]);
+  }, [user, dayScore, tasks, timeLogs, analyzeAndShowPopup, lastPopupTime]);
 
   const value = {
     // State
@@ -224,13 +273,15 @@ export const AIProvider = ({ children }) => {
     analyzeAndShowPopup,
     handlePopupAction,
     toggleRecoveryMode,
+    disableAIPopups,
     closePopup,
     triggerAIPopup,
     getPopupAnalytics,
     
     // Utils
     buildUserContext,
-    aiAvailable: aiService.isAvailable()
+    aiAvailable: aiService.isAvailable(),
+    aiTemporarilyDisabled: aiService.isTemporarilyDisabled()
   };
 
   return (

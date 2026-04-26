@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Filter, CheckSquare, Clock, User } from 'lucide-react';
+import { Plus, Search, Filter, CheckSquare, Clock, User, Play, Pause, BarChart3 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { format } from 'date-fns';
+import toast from 'react-hot-toast';
 
-// TaskItem Component
-const TaskItem = ({ task, onComplete, onUpdateStatus, onDelete }) => {
+// TaskItem Component with enhanced functionality
+const TaskItem = ({ task, onComplete, onUpdateStatus, onDelete, onStartTimer }) => {
+  // Safety check for task object
+  if (!task || !task._id) {
+    return null;
+  }
+
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'urgent': return 'bg-red-500';
@@ -18,15 +24,41 @@ const TaskItem = ({ task, onComplete, onUpdateStatus, onDelete }) => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'todo': return 'text-blue-600 bg-blue-50';
-      case 'in-progress': return 'text-orange-600 bg-orange-50';
-      case 'done': return 'text-green-600 bg-green-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'todo': return 'text-blue-600 bg-blue-50 border-blue-200';
+      case 'in-progress': return 'text-orange-600 bg-orange-50 border-orange-200';
+      case 'done': return 'text-green-600 bg-green-50 border-green-200';
+      default: return 'text-gray-600 bg-gray-50 border-gray-200';
     }
   };
 
+  const formatDueDate = (dueDate) => {
+    if (!dueDate) return '';
+    try {
+      const date = new Date(dueDate);
+      const now = new Date();
+      const diffTime = date.getTime() - now.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays < 0) return `Overdue by ${Math.abs(diffDays)} days`;
+      if (diffDays === 0) return 'Due today';
+      if (diffDays === 1) return 'Due tomorrow';
+      return `Due in ${diffDays} days`;
+    } catch (error) {
+      return 'Invalid date';
+    }
+  };
+
+  const isOverdue = (dueDate) => {
+    if (!dueDate) return false;
+    return new Date(dueDate) < new Date() && task.status !== 'done';
+  };
+
   return (
-    <div className="p-4 hover:bg-gray-50 transition-colors">
+    <div className={`p-4 hover:bg-gray-50 transition-colors border-l-4 ${
+      isOverdue(task.dueDate) ? 'border-red-500 bg-red-50' : 
+      task.status === 'in-progress' ? 'border-orange-500' : 
+      task.status === 'done' ? 'border-green-500' : 'border-transparent'
+    }`}>
       <div className="flex items-start space-x-3">
         {/* Priority Indicator */}
         <div className={`w-3 h-3 rounded-full mt-2 ${getPriorityColor(task.priority)}`} />
@@ -35,8 +67,10 @@ const TaskItem = ({ task, onComplete, onUpdateStatus, onDelete }) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h3 className="text-base font-medium text-gray-900 mb-1">
-                {task.title}
+              <h3 className={`text-base font-medium mb-1 ${
+                task.status === 'done' ? 'line-through text-gray-500' : 'text-gray-900'
+              }`}>
+                {task.title || 'Untitled Task'}
               </h3>
               {task.description && (
                 <p className="text-gray-600 text-sm mb-2">
@@ -45,52 +79,90 @@ const TaskItem = ({ task, onComplete, onUpdateStatus, onDelete }) => {
               )}
               
               {/* Task Meta */}
-              <div className="flex items-center space-x-3 text-xs text-gray-500">
+              <div className="flex items-center space-x-3 text-xs text-gray-500 mb-2">
                 {task.dueDate && (
-                  <div className="flex items-center space-x-1">
+                  <div className={`flex items-center space-x-1 ${
+                    isOverdue(task.dueDate) ? 'text-red-600 font-medium' : ''
+                  }`}>
                     <Clock className="w-3 h-3" />
-                    <span>Due {format(new Date(task.dueDate), 'MMM d')}</span>
+                    <span>{formatDueDate(task.dueDate)}</span>
                   </div>
                 )}
-                <span className="capitalize">{task.category}</span>
-                <span className="capitalize">{task.priority}</span>
+                <span className="capitalize">{task.category || 'other'}</span>
+                <span className="capitalize">{task.priority || 'medium'}</span>
+                {task.scoreImpact && (
+                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                    Impact: {task.scoreImpact}/10
+                  </span>
+                )}
               </div>
+
+              {/* Time Tracking Info */}
+              {(task.estimatedTime || task.actualTime) && (
+                <div className="flex items-center space-x-3 text-xs text-gray-500 mb-2">
+                  {task.estimatedTime && (
+                    <span>Est: {Math.round(task.estimatedTime / 60)}h {task.estimatedTime % 60}m</span>
+                  )}
+                  {task.actualTime && (
+                    <span>Actual: {Math.round(task.actualTime / 60)}h {task.actualTime % 60}m</span>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Status Badge */}
             <div className="flex items-center space-x-2">
-              <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
+              <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getStatusColor(task.status || 'todo')}`}>
                 {task.status === 'in-progress' ? 'In Progress' : task.status === 'todo' ? 'To Do' : 'Done'}
               </span>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center space-x-2 mt-2">
+          <div className="flex items-center space-x-3 mt-3">
             {task.status !== 'done' && (
-              <button
-                onClick={() => onComplete(task._id)}
-                className="text-green-600 hover:text-green-700 text-xs font-medium"
-              >
-                Complete
-              </button>
+              <>
+                <button
+                  onClick={() => onComplete(task._id)}
+                  className="flex items-center space-x-1 text-green-600 hover:text-green-700 text-xs font-medium bg-green-50 hover:bg-green-100 px-2 py-1 rounded transition-colors"
+                >
+                  <CheckSquare className="w-3 h-3" />
+                  <span>Complete</span>
+                </button>
+                
+                {task.status === 'todo' && (
+                  <button
+                    onClick={() => onUpdateStatus(task._id, 'in-progress')}
+                    className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-xs font-medium bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded transition-colors"
+                  >
+                    <Play className="w-3 h-3" />
+                    <span>Start</span>
+                  </button>
+                )}
+
+                {task.status === 'in-progress' && (
+                  <button
+                    onClick={() => onUpdateStatus(task._id, 'todo')}
+                    className="flex items-center space-x-1 text-orange-600 hover:text-orange-700 text-xs font-medium bg-orange-50 hover:bg-orange-100 px-2 py-1 rounded transition-colors"
+                  >
+                    <Pause className="w-3 h-3" />
+                    <span>Pause</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => onStartTimer(task)}
+                  className="flex items-center space-x-1 text-purple-600 hover:text-purple-700 text-xs font-medium bg-purple-50 hover:bg-purple-100 px-2 py-1 rounded transition-colors"
+                >
+                  <Clock className="w-3 h-3" />
+                  <span>Track Time</span>
+                </button>
+              </>
             )}
             
-            {task.status === 'todo' && (
-              <button
-                onClick={() => onUpdateStatus(task._id, 'in-progress')}
-                className="text-blue-600 hover:text-blue-700 text-xs font-medium"
-              >
-                Start
-              </button>
-            )}
-            
-            <button className="text-gray-400 hover:text-gray-600 text-xs font-medium">
-              Edit
-            </button>
             <button 
               onClick={() => onDelete(task._id)}
-              className="text-red-400 hover:text-red-600 text-xs font-medium"
+              className="text-red-400 hover:text-red-600 text-xs font-medium bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition-colors"
             >
               Delete
             </button>
@@ -153,9 +225,28 @@ const TasksPage = () => {
     await updateTask(taskId, { status });
   };
 
-  const filteredTasks = tasks.filter(task => {
-    const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         task.description?.toLowerCase().includes(searchTerm.toLowerCase());
+  const handleStartTimer = (task) => {
+    // Navigate to time tracker with task context
+    const taskInfo = {
+      id: task._id,
+      title: task.title,
+      category: task.category,
+      panel: task.panel
+    };
+    
+    // Store task info in sessionStorage for time tracker
+    sessionStorage.setItem('activeTask', JSON.stringify(taskInfo));
+    
+    // Navigate to time tracker
+    window.location.href = '/app/time-tracker';
+    
+    // Show success message
+    toast.success(`Started time tracking for "${task.title}"`);
+  };
+
+  const filteredTasks = (tasks || []).filter(task => {
+    const matchesSearch = (task.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (task.description || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesPanel = activePanel === 'all' || task.panel === activePanel;
     
@@ -206,27 +297,85 @@ const TasksPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="card p-4">
           <div className="text-2xl font-bold text-blue-600">
-            {tasks.filter(t => t.status === 'todo' && (activePanel === 'all' || t.panel === activePanel)).length}
+            {(() => {
+              const academicTodos = (tasks || []).filter(t => t.status === 'todo' && t.panel === 'academic').length;
+              const personalTodos = (tasks || []).filter(t => t.status === 'todo' && t.panel === 'personal').length;
+              const totalTodos = academicTodos + personalTodos;
+              
+              if (activePanel === 'all') {
+                return (
+                  <div className="flex flex-col">
+                    <span>{totalTodos}</span>
+                    <div className="text-xs text-gray-500 font-normal mt-1">
+                      Academic: {academicTodos} + Personal: {personalTodos}
+                    </div>
+                  </div>
+                );
+              } else {
+                return (tasks || []).filter(t => t.status === 'todo' && t.panel === activePanel).length;
+              }
+            })()}
           </div>
           <div className="text-sm text-gray-600">To Do</div>
         </div>
         <div className="card p-4">
           <div className="text-2xl font-bold text-orange-600">
-            {tasks.filter(t => t.status === 'in-progress' && (activePanel === 'all' || t.panel === activePanel)).length}
+            {(() => {
+              const academicInProgress = (tasks || []).filter(t => t.status === 'in-progress' && t.panel === 'academic').length;
+              const personalInProgress = (tasks || []).filter(t => t.status === 'in-progress' && t.panel === 'personal').length;
+              const totalInProgress = academicInProgress + personalInProgress;
+              
+              if (activePanel === 'all') {
+                return (
+                  <div className="flex flex-col">
+                    <span>{totalInProgress}</span>
+                    <div className="text-xs text-gray-500 font-normal mt-1">
+                      Academic: {academicInProgress} + Personal: {personalInProgress}
+                    </div>
+                  </div>
+                );
+              } else {
+                return (tasks || []).filter(t => t.status === 'in-progress' && t.panel === activePanel).length;
+              }
+            })()}
           </div>
           <div className="text-sm text-gray-600">In Progress</div>
         </div>
         <div className="card p-4">
           <div className="text-2xl font-bold text-green-600">
-            {tasks.filter(t => t.status === 'done' && (activePanel === 'all' || t.panel === activePanel)).length}
+            {(() => {
+              const academicDone = (tasks || []).filter(t => t.status === 'done' && t.panel === 'academic').length;
+              const personalDone = (tasks || []).filter(t => t.status === 'done' && t.panel === 'personal').length;
+              const totalDone = academicDone + personalDone;
+              
+              if (activePanel === 'all') {
+                return (
+                  <div className="flex flex-col">
+                    <span>{totalDone}</span>
+                    <div className="text-xs text-gray-500 font-normal mt-1">
+                      Academic: {academicDone} + Personal: {personalDone}
+                    </div>
+                  </div>
+                );
+              } else {
+                return (tasks || []).filter(t => t.status === 'done' && t.panel === activePanel).length;
+              }
+            })()}
           </div>
           <div className="text-sm text-gray-600">Done</div>
         </div>
         <div className="card p-4">
           <div className="text-2xl font-bold text-gray-900">
             {(() => {
-              const panelTasks = tasks.filter(t => activePanel === 'all' || t.panel === activePanel);
-              return panelTasks.length > 0 ? Math.round((panelTasks.filter(t => t.status === 'done').length / panelTasks.length) * 100) : 0;
+              if (activePanel === 'all') {
+                const allTasks = (tasks || []);
+                const totalTasks = allTasks.length;
+                const completedTasks = allTasks.filter(t => t.status === 'done').length;
+                return totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+              } else {
+                const panelTasks = (tasks || []).filter(t => t.panel === activePanel);
+                return panelTasks.length > 0 ? Math.round((panelTasks.filter(t => t.status === 'done').length / panelTasks.length) * 100) : 0;
+              }
             })()}%
           </div>
           <div className="text-sm text-gray-600">Completion Rate</div>
@@ -306,19 +455,19 @@ const TasksPage = () => {
                 <CheckSquare className="w-5 h-5 text-blue-600" />
                 <h2 className="text-lg font-semibold text-blue-900">Academic Tasks</h2>
                 <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
-                  {tasks.filter(t => t.panel === 'academic' && (activeTab === 'all' || t.status === activeTab)).length}
+                  {(tasks || []).filter(t => t.panel === 'academic' && (activeTab === 'all' || t.status === activeTab)).length}
                 </span>
               </div>
             </div>
             <div className="divide-y divide-gray-200">
-              {tasks.filter(t => t.panel === 'academic' && (activeTab === 'all' || t.status === activeTab) && 
-                (t.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                 t.description?.toLowerCase().includes(searchTerm.toLowerCase()))).map(task => (
-                <TaskItem key={task._id} task={task} onComplete={handleCompleteTask} onUpdateStatus={handleUpdateTaskStatus} onDelete={deleteTask} />
+              {(tasks || []).filter(t => t.panel === 'academic' && (activeTab === 'all' || t.status === activeTab) && 
+                ((t.title || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                 (t.description || '').toLowerCase().includes(searchTerm.toLowerCase()))).map(task => (
+                <TaskItem key={task._id} task={task} onComplete={handleCompleteTask} onUpdateStatus={handleUpdateTaskStatus} onDelete={deleteTask} onStartTimer={handleStartTimer} />
               ))}
-              {tasks.filter(t => t.panel === 'academic' && (activeTab === 'all' || t.status === activeTab) && 
-                (t.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                 t.description?.toLowerCase().includes(searchTerm.toLowerCase()))).length === 0 && (
+              {(tasks || []).filter(t => t.panel === 'academic' && (activeTab === 'all' || t.status === activeTab) && 
+                ((t.title || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                 (t.description || '').toLowerCase().includes(searchTerm.toLowerCase()))).length === 0 && (
                 <div className="p-8 text-center">
                   <CheckSquare className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                   <p className="text-gray-500 text-sm">No academic tasks found</p>
@@ -334,19 +483,19 @@ const TasksPage = () => {
                 <User className="w-5 h-5 text-purple-600" />
                 <h2 className="text-lg font-semibold text-purple-900">Personal Tasks</h2>
                 <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2 py-1 rounded-full">
-                  {tasks.filter(t => t.panel === 'personal' && (activeTab === 'all' || t.status === activeTab)).length}
+                  {(tasks || []).filter(t => t.panel === 'personal' && (activeTab === 'all' || t.status === activeTab)).length}
                 </span>
               </div>
             </div>
             <div className="divide-y divide-gray-200">
-              {tasks.filter(t => t.panel === 'personal' && (activeTab === 'all' || t.status === activeTab) && 
-                (t.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                 t.description?.toLowerCase().includes(searchTerm.toLowerCase()))).map(task => (
-                <TaskItem key={task._id} task={task} onComplete={handleCompleteTask} onUpdateStatus={handleUpdateTaskStatus} onDelete={deleteTask} />
+              {(tasks || []).filter(t => t.panel === 'personal' && (activeTab === 'all' || t.status === activeTab) && 
+                ((t.title || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                 (t.description || '').toLowerCase().includes(searchTerm.toLowerCase()))).map(task => (
+                <TaskItem key={task._id} task={task} onComplete={handleCompleteTask} onUpdateStatus={handleUpdateTaskStatus} onDelete={deleteTask} onStartTimer={handleStartTimer} />
               ))}
-              {tasks.filter(t => t.panel === 'personal' && (activeTab === 'all' || t.status === activeTab) && 
-                (t.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                 t.description?.toLowerCase().includes(searchTerm.toLowerCase()))).length === 0 && (
+              {(tasks || []).filter(t => t.panel === 'personal' && (activeTab === 'all' || t.status === activeTab) && 
+                ((t.title || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                 (t.description || '').toLowerCase().includes(searchTerm.toLowerCase()))).length === 0 && (
                 <div className="p-8 text-center">
                   <User className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                   <p className="text-gray-500 text-sm">No personal tasks found</p>
@@ -379,7 +528,7 @@ const TasksPage = () => {
           </div>
           <div className="divide-y divide-gray-200">
             {filteredTasks.map(task => (
-              <TaskItem key={task._id} task={task} onComplete={handleCompleteTask} onUpdateStatus={handleUpdateTaskStatus} onDelete={deleteTask} />
+              <TaskItem key={task._id} task={task} onComplete={handleCompleteTask} onUpdateStatus={handleUpdateTaskStatus} onDelete={deleteTask} onStartTimer={handleStartTimer} />
             ))}
 
             {filteredTasks.length === 0 && (

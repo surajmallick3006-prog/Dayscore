@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, connectAuthEmulator } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getStorage, connectStorageEmulator } from 'firebase/storage';
 import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
@@ -25,6 +26,9 @@ export const auth = getAuth(app);
 // Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app);
 
+// Initialize Firebase Storage and get a reference to the service
+export const storage = getStorage(app);
+
 // Initialize Analytics
 let analytics = null;
 if (typeof window !== 'undefined') {
@@ -40,6 +44,9 @@ if (process.env.REACT_APP_USE_FIREBASE_EMULATOR === 'true' && process.env.NODE_E
     
     // Connect to Firestore emulator
     connectFirestoreEmulator(db, 'localhost', 8080);
+    
+    // Connect to Storage emulator
+    connectStorageEmulator(storage, 'localhost', 9199);
     
     console.log('🔧 Connected to Firebase emulators');
   } catch (error) {

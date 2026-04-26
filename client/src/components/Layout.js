@@ -12,14 +12,16 @@ const Layout = () => {
       <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
       
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className="lg:pl-80">
         {/* Header */}
         <Header onMenuClick={() => setSidebarOpen(true)} />
         
-        {/* Page content - Optimized padding */}
-        <main className="py-2">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <Outlet />
+        {/* Page content - Clean background matching the design */}
+        <main className="py-6">
+          <div className="mx-auto max-w-7xl px-6">
+            <div className="bg-white rounded-2xl shadow-sm min-h-[calc(100vh-10rem)] p-6">
+              <Outlet />
+            </div>
           </div>
         </main>
       </div>

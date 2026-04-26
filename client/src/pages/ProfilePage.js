@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, Upload, Sun, Moon, Clock, Zap, Target, MapPin, Settings, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useServerAuth } from '../context/ServerAuthContext';
+import FileUpload from '../components/FileUpload';
 
 const ProfilePage = () => {
   const { user, updateProfile } = useServerAuth();
@@ -10,7 +11,7 @@ const ProfilePage = () => {
     email: user?.email || '',
     address: '',
     role: 'Professional',
-    ageGroup: 'Professional',
+    ageGroup: '18-30',
     wakeUpTime: '7:00 AM',
     sleepTime: '11:00 PM'
   });
@@ -71,20 +72,23 @@ const ProfilePage = () => {
                 {/* Age Group Selection */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Age Group</label>
-                  <div className="flex space-x-2">
-                    {['Student', 'Student', 'Professional'].map((group, index) => (
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { label: '1-18', value: '1-18', color: 'bg-green-500' },
+                      { label: '18-30', value: '18-30', color: 'bg-blue-500' },
+                      { label: '30-60', value: '30-60', color: 'bg-purple-500' },
+                      { label: '60+', value: '60+', color: 'bg-orange-500' }
+                    ].map((group, index) => (
                       <button
                         key={index}
-                        onClick={() => setProfileData(prev => ({ ...prev, ageGroup: group }))}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          profileData.ageGroup === group
-                            ? index === 0 ? 'bg-orange-500 text-white' 
-                              : index === 1 ? 'bg-pink-500 text-white'
-                              : 'bg-yellow-500 text-white'
+                        onClick={() => setProfileData(prev => ({ ...prev, ageGroup: group.value }))}
+                        className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                          profileData.ageGroup === group.value
+                            ? `${group.color} text-white shadow-md`
                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }`}
                       >
-                        {group}
+                        {group.label}
                       </button>
                     ))}
                   </div>
@@ -98,10 +102,13 @@ const ProfilePage = () => {
                     onChange={(e) => setProfileData(prev => ({ ...prev, role: e.target.value }))}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="Professional">Professional</option>
                     <option value="Student">Student</option>
+                    <option value="Professional">Professional</option>
                     <option value="Freelancer">Freelancer</option>
                     <option value="Entrepreneur">Entrepreneur</option>
+                    <option value="Retired">Retired</option>
+                    <option value="Parent">Parent</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
 
@@ -201,24 +208,43 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* Right Column - Address & Preferences */}
+          {/* Right Column - Email & Preferences */}
           <div className="space-y-6">
-            {/* Address */}
+            {/* Email */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Address</h3>
-              <textarea
-                placeholder="Enter your address"
-                value={profileData.address}
-                onChange={(e) => setProfileData(prev => ({ ...prev, address: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24 resize-none"
-              />
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Email</h3>
               
-              <div className="mt-4">
-                <div className="flex items-center space-x-2 text-gray-600 mb-2">
-                  <Upload className="w-4 h-4" />
-                  <span className="text-sm">Upload</span>
-                </div>
-                <p className="text-xs text-gray-500">JPG, GIF or PNG, 1MB max.</p>
+              {/* Email Address Field */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                <input
+                  type="email"
+                  value={profileData.email}
+                  onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  placeholder="Your email address"
+                  readOnly
+                />
+                <p className="text-xs text-gray-500 mt-1">This is the email address you used to sign up</p>
+              </div>
+              
+              {/* File Upload Section */}
+              <div className="mt-6">
+                <FileUpload
+                  onUploadComplete={(result) => {
+                    console.log('File uploaded:', result);
+                    // You can store the file URL in profileData if needed
+                    // setProfileData(prev => ({ ...prev, attachments: [...(prev.attachments || []), result] }));
+                  }}
+                  onUploadError={(error) => {
+                    console.error('Upload error:', error);
+                  }}
+                  folder="profile-attachments"
+                  multiple={true}
+                  label="Upload Documents"
+                  description="JPG, GIF or PNG, 256KB max."
+                  showPreview={true}
+                />
               </div>
             </div>
 

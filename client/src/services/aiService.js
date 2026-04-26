@@ -3,7 +3,7 @@ import { collection, doc, setDoc, query, where, getDocs, orderBy, limit } from '
 import { format } from 'date-fns';
 
 // DayScore AI System Prompt
-const DAYSCORE_SYSTEM_PROMPT = `You are DayScore AI, a deeply empathetic and emotionally intelligent companion for students. Your primary role is to provide genuine emotional support and understanding.
+const DAYSCORE_SYSTEM_PROMPT = `You are DayScore AI, a deeply empathetic and emotionally intelligent companion for people of all ages. Your primary role is to provide genuine emotional support and understanding.
 
 Your job is to:
 1. Analyze user behavior data with deep emotional intelligence
@@ -17,6 +17,7 @@ Core Principles:
 - CREATE SAFETY: Make them feel heard, accepted, and not alone
 - AVOID TOXIC POSITIVITY: Don't rush to "fix" or minimize their struggles
 - BE PRESENT: Focus on their current emotional state, not productivity
+- BE AGE-APPROPRIATE: Adapt language and advice to different life stages
 
 For LOW MOOD situations (mood ≤ 4), you MUST:
 - Validate their emotional experience without trying to fix it
@@ -33,6 +34,7 @@ Message Guidelines:
 - Remind them they're not alone in feeling this way
 - Focus on self-compassion over self-improvement
 - Keep messages 2-3 lines but make them deeply meaningful
+- Adapt tone for different age groups (teens, young adults, professionals, seniors)
 
 Tone Matching:
 - Low mood + low productivity → DEEP CONSOLATION, emotional safety
@@ -56,9 +58,36 @@ class AIService {
     this.isRecoveryMode = false;
   }
 
-  // Check if OpenAI is available
+  // Check if OpenAI is available and not rate limited
   isAvailable() {
-    return !!this.apiKey;
+    if (!this.apiKey) return false;
+    
+    // Check if we're in a rate limit cooldown
+    const lastCall = localStorage.getItem('lastAICall');
+    const now = Date.now();
+    const cooldownPeriod = 5 * 60 * 1000; // 5 minutes
+    
+    if (lastCall && (now - parseInt(lastCall)) < cooldownPeriod) {
+      return false;
+    }
+    
+    return true;
+  }
+
+  // Check if AI popups are temporarily disabled due to errors
+  isTemporarilyDisabled() {
+    const disabledUntil = localStorage.getItem('aiDisabledUntil');
+    if (disabledUntil && Date.now() < parseInt(disabledUntil)) {
+      return true;
+    }
+    return false;
+  }
+
+  // Temporarily disable AI popups (for rate limit errors)
+  temporarilyDisable(minutes = 30) {
+    const disableUntil = Date.now() + (minutes * 60 * 1000);
+    localStorage.setItem('aiDisabledUntil', disableUntil.toString());
+    console.log(`🚫 AI popups disabled for ${minutes} minutes due to API issues`);
   }
 
   // Set recovery mode (reduces warnings, shows only consoling messages)
@@ -75,6 +104,11 @@ class AIService {
 
   // Analyze user context and determine if AI should trigger
   shouldTriggerAI(context) {
+    // Don't trigger if temporarily disabled
+    if (this.isTemporarilyDisabled()) {
+      return null;
+    }
+
     const { dayScore, mood, sleep, studyTime, workTime, entertainmentTime, completedTasks, totalTasks } = context;
     
     // Recovery mode - prioritize emotional support
@@ -107,6 +141,16 @@ class AIService {
   // Generate AI popup message
   async generatePopup(context, intent = null) {
     try {
+      // Check rate limiting first
+      const lastCall = localStorage.getItem('lastAICall');
+      const now = Date.now();
+      const cooldownPeriod = 5 * 60 * 1000; // 5 minutes cooldown
+      
+      if (lastCall && (now - parseInt(lastCall)) < cooldownPeriod) {
+        console.log('🚫 AI Service: Rate limited, using fallback');
+        return this.getFallbackMessage(context, intent);
+      }
+
       if (!this.isAvailable()) {
         return this.getFallbackMessage(context, intent);
       }
@@ -116,6 +160,9 @@ class AIService {
       const recentMessages = recentPopups.map(p => p.message);
 
       const userPrompt = this.buildUserPrompt(context, intent, recentMessages);
+
+      // Store the API call timestamp
+      localStorage.setItem('lastAICall', now.toString());
 
       const response = await fetch(this.baseURL, {
         method: 'POST',
@@ -135,6 +182,18 @@ class AIService {
       });
 
       if (!response.ok) {
+        // Handle specific error codes
+        if (response.status === 429) {
+          console.warn('🚫 OpenAI rate limit exceeded, using fallback');
+          // Set longer cooldown for rate limit errors and temporarily disable
+          localStorage.setItem('lastAICall', (now + 30 * 60 * 1000).toString()); // 30 min cooldown
+          this.temporarilyDisable(60); // Disable for 1 hour
+        } else if (response.status === 401) {
+          console.error('🚫 OpenAI API key invalid');
+          this.temporarilyDisable(120); // Disable for 2 hours
+        } else {
+          console.error(`🚫 OpenAI API error: ${response.status}`);
+        }
         throw new Error(`OpenAI API error: ${response.status}`);
       }
 
@@ -168,7 +227,7 @@ class AIService {
   buildUserPrompt(context, intent, recentMessages) {
     const { dayScore, mood, sleep, studyTime, workTime, entertainmentTime, completedTasks, totalTasks } = context;
     
-    let prompt = `Generate a deeply empathetic popup message for a student with:
+    let prompt = `Generate a deeply empathetic popup message for a person with:
 - DayScore: ${dayScore}/100
 - Mood: ${mood}/10 (THIS IS CRITICAL - if mood ≤ 4, prioritize deep emotional support)
 - Sleep: ${sleep} hours

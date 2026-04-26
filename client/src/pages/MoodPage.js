@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Smile, TrendingUp, Calendar, Heart, X, CheckCircle } from 'lucide-react';
+import { useData } from '../context/DataContext';
 
 const MoodPage = () => {
+  const { saveMoodData } = useData();
   const [selectedMood, setSelectedMood] = useState(3);
   const [energy, setEnergy] = useState(7);
   const [stress, setStress] = useState(4);
@@ -271,6 +273,17 @@ const MoodPage = () => {
     
     // Save to localStorage
     localStorage.setItem('moodEntries', JSON.stringify(updatedEntries));
+    
+    // Sync to DataContext / API
+    saveMoodData({
+      mood: selectedMood,
+      energy,
+      stress,
+      notes: notes.trim(),
+      moodScore: scores.moodScore,
+      wellnessScore: scores.wellnessScore,
+      date: new Date().toISOString(),
+    });
     
     // Also save latest scores for dashboard access with wellness components
     localStorage.setItem('latestMoodWellnessScores', JSON.stringify({

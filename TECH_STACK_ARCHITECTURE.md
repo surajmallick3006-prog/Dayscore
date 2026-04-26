@@ -2,7 +2,7 @@
 # 🏗️ DayScore - Tech Stack & Architecture Documentation
 
 ## 📋 **Project Overview**
-DayScore is a comprehensive daily productivity and wellness tracking application that combines task management, time tracking, health monitoring, mood analysis, and AI-powered emotional support into a unified dashboard experience.
+DayScore is a comprehensive daily productivity and wellness tracking application that combines task management, time tracking, health monitoring, mood analysis, and AI-powered emotional support into a unified dashboard experience.run
 
 ---
 

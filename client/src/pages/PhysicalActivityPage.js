@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Activity, Brain, Target, ArrowLeft, Clock, Trophy, Calendar, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useData } from '../context/DataContext';
+import toast from 'react-hot-toast';
 
 const PhysicalActivityPage = () => {
   const navigate = useNavigate();
+  const { saveHealthData } = useData();
   const [selectedActivity, setSelectedActivity] = useState('Cardio');
   const [selectedPeriod, setSelectedPeriod] = useState('7 Days');
   const [duration, setDuration] = useState(30);
@@ -44,9 +47,26 @@ const PhysicalActivityPage = () => {
   const weeklyData = getActivityDataForPeriod();
 
   const logActivity = () => {
-    // Activity logging functionality
-    console.log(`Activity logged: ${selectedActivity}, Duration: ${duration} mins, Intensity: ${intensity}`);
-    // Here you would typically save to database
+    const activeMinutes = duration;
+    setActivityData(prev => ({
+      ...prev,
+      activeTime: `${duration} mins`,
+      workoutsDone: `${parseInt(prev.workoutsDone) + 1} today`,
+      lastActivity: `Today • ${selectedActivity} • ${duration} mins`,
+      score: Math.min(100, Math.round((duration / prev.dailyGoal) * 100))
+    }));
+
+    // Sync to DataContext / API
+    saveHealthData({
+      activity: {
+        activeMinutes,
+        exerciseType: selectedActivity,
+        intensity,
+        steps: Math.round(activeMinutes * 100),
+      },
+      date: new Date().toISOString(),
+    });
+    toast.success(`${selectedActivity} logged — ${duration} mins!`);
   };
 
   return (

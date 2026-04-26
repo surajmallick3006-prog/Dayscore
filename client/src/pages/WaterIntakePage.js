@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Droplets, Brain, Target, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useData } from '../context/DataContext';
 
 const WaterIntakePage = () => {
   const navigate = useNavigate();
+  const { saveHealthData } = useData();
   const [selectedPeriod, setSelectedPeriod] = useState('7 Days');
   
   const [waterData, setWaterData] = useState({
@@ -68,10 +70,16 @@ const WaterIntakePage = () => {
     
     setWaterData(prev => ({
       ...prev,
-      intake: newIntake, // Allow unlimited consumption
-      score: Math.round((newIntake / prev.goal) * 100), // Allow scores above 100%
+      intake: newIntake,
+      score: Math.round((newIntake / prev.goal) * 100),
       hydrationLevel: hydrationLevel
     }));
+
+    // Sync to DataContext / API
+    saveHealthData({
+      water: { intake: newIntake, goal: waterData.goal },
+      date: new Date().toISOString(),
+    });
   };
 
   return (

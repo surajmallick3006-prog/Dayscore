@@ -2,6 +2,7 @@ import React, { createContext, useContext, useReducer, useCallback } from 'react
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import hybridAuthService from '../services/hybridAuthService';
+import dayScoreService from '../services/dayScoreService';
 
 const DataContext = createContext();
 
@@ -13,7 +14,7 @@ const dataReducer = (state, action) => {
     case 'SET_DAY_SCORE':
       return { ...state, dayScore: action.payload };
     case 'SET_TASKS':
-      return { ...state, tasks: action.payload };
+      return { ...state, tasks: action.payload || [] };
     case 'ADD_TASK':
       return { ...state, tasks: [...state.tasks, action.payload] };
     case 'UPDATE_TASK':
@@ -121,14 +122,35 @@ export const DataProvider = ({ children }) => {
   };
 
   // Day Score functions
-  const fetchDayScore = useCallback(async (date = null) => {
+  const fetchDayScore = useCallback(async (date = null, forceRecalculate = false) => {
     try {
       setLoading('dayScore', true);
-      const params = date ? `?date=${date}` : '';
-      const response = await hybridAuthService.apiCall(`/api/dayscore/today${params}`);
-      dispatch({ type: 'SET_DAY_SCORE', payload: response.dayScore });
+      
+      // Use the real day score service
+      const scoreData = await dayScoreService.getTodayScore(forceRecalculate);
+      
+      dispatch({ type: 'SET_DAY_SCORE', payload: scoreData });
+      return { success: true, data: scoreData };
     } catch (error) {
+      console.error('Failed to fetch day score:', error);
       handleApiError(error, 'Failed to fetch day score');
+      
+      // Return fallback data
+      const fallbackScore = {
+        overall: 75,
+        components: {
+          productivity: 75,
+          health: 75,
+          focus: 75,
+          wellness: 75
+        },
+        date: new Date().toISOString().split('T')[0],
+        timestamp: new Date(),
+        isFallback: true
+      };
+      
+      dispatch({ type: 'SET_DAY_SCORE', payload: fallbackScore });
+      return { success: false, data: fallbackScore, error };
     } finally {
       setLoading('dayScore', false);
     }
@@ -137,12 +159,17 @@ export const DataProvider = ({ children }) => {
   const recalculateDayScore = useCallback(async (date = null) => {
     try {
       setLoading('dayScore', true);
-      const response = await hybridAuthService.apiCall('/api/dayscore/calculate', 'POST', { date });
-      dispatch({ type: 'SET_DAY_SCORE', payload: response.dayScore });
+      
+      // Force recalculation using the real service
+      const scoreData = await dayScoreService.getTodayScore(true);
+      
+      dispatch({ type: 'SET_DAY_SCORE', payload: scoreData });
       toast.success('Day score updated!');
+      return { success: true, data: scoreData };
     } catch (error) {
       console.error('Recalculate day score error:', error);
       toast.error('Failed to recalculate day score');
+      return { success: false, error };
     } finally {
       setLoading('dayScore', false);
     }
@@ -155,9 +182,14 @@ export const DataProvider = ({ children }) => {
       const queryParams = new URLSearchParams(filters).toString();
       const params = queryParams ? `?${queryParams}` : '';
       const response = await hybridAuthService.apiCall(`/api/tasks${params}`);
-      dispatch({ type: 'SET_TASKS', payload: response.tasks });
+      
+      // Ensure we always have an array for tasks
+      const tasks = Array.isArray(response?.tasks) ? response.tasks : [];
+      dispatch({ type: 'SET_TASKS', payload: tasks });
     } catch (error) {
       handleApiError(error, 'Failed to fetch tasks');
+      // Ensure tasks is set to empty array on error
+      dispatch({ type: 'SET_TASKS', payload: [] });
     } finally {
       setLoading('tasks', false);
     }

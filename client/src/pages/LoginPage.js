@@ -266,7 +266,7 @@ const LoginPage = () => {
                   to="/register"
                   className="text-primary-400 hover:text-primary-300 font-medium transition-colors"
                 >
-                  Join the waitlist
+                  Sign Up
                 </Link>
               </div>
             )}

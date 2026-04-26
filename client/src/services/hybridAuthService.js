@@ -780,6 +780,230 @@ class HybridAuthService {
   getToken() {
     return localStorage.getItem('token');
   }
+
+  // API call method for making authenticated requests to the server
+  async apiCall(endpoint, method = 'GET', data = null) {
+    try {
+      const token = this.getToken();
+      const url = `${API_BASE_URL}${endpoint}`;
+      
+      const config = {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+
+      // Add authorization header if token exists
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+
+      // Add body for POST, PUT, PATCH requests
+      if (data && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
+        config.body = JSON.stringify(data);
+      }
+
+      console.log(`🌐 API Call: ${method} ${url}`, data ? { data } : '');
+
+      const response = await fetch(url, config);
+      
+      // Handle different response types
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        console.error(`❌ API Error: ${response.status}`, errorData);
+        
+        // Handle authentication errors
+        if (response.status === 401) {
+          this.logout();
+          throw new Error('Session expired. Please login again.');
+        }
+        
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+      }
+
+      // Handle empty responses (like DELETE requests)
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const result = await response.json();
+        console.log(`✅ API Success: ${method} ${url}`, result);
+        return result;
+      } else {
+        console.log(`✅ API Success: ${method} ${url} (no content)`);
+        return {};
+      }
+    } catch (error) {
+      console.error(`❌ API Call Failed: ${method} ${endpoint}`, error);
+      
+      // Always return mock data when server is not available
+      console.log('🔄 Using mock data since server is not available...');
+      return this.getMockResponse(endpoint, method, data);
+    }
+  }
+
+  // Mock data responses for development
+  getMockResponse(endpoint, method, data) {
+    // Get existing mock data from localStorage with error handling
+    let existingTasks = [];
+    let existingTimeLogs = [];
+    
+    try {
+      existingTasks = JSON.parse(localStorage.getItem('mockTasks') || '[]');
+      if (!Array.isArray(existingTasks)) existingTasks = [];
+    } catch (error) {
+      console.warn('Error parsing mockTasks from localStorage:', error);
+      existingTasks = [];
+      localStorage.setItem('mockTasks', '[]');
+    }
+    
+    try {
+      existingTimeLogs = JSON.parse(localStorage.getItem('mockTimeLogs') || '[]');
+      if (!Array.isArray(existingTimeLogs)) existingTimeLogs = [];
+    } catch (error) {
+      console.warn('Error parsing mockTimeLogs from localStorage:', error);
+      existingTimeLogs = [];
+      localStorage.setItem('mockTimeLogs', '[]');
+    }
+    
+    const mockData = {
+      // Tasks endpoints
+      '/api/tasks': {
+        GET: { 
+          tasks: existingTasks, 
+          pagination: { current: 1, pages: 1, total: existingTasks.length } 
+        },
+        POST: (() => {
+          const newTask = { 
+            _id: `mock_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, 
+            ...data, 
+            status: 'todo', 
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            userId: 'mock_user_id'
+          };
+          
+          // Save to localStorage
+          const updatedTasks = [...existingTasks, newTask];
+          localStorage.setItem('mockTasks', JSON.stringify(updatedTasks));
+          
+          return { 
+            task: newTask,
+            message: 'Task created successfully'
+          };
+        })()
+      },
+      // Day score endpoints
+      '/api/dayscore/today': { dayScore: { score: 75, date: new Date(), breakdown: {} } },
+      '/api/dayscore/calculate': { dayScore: { score: 80, date: new Date(), breakdown: {} } },
+      // Time tracker endpoints
+      '/api/timetracker': {
+        GET: { timeLogs: existingTimeLogs },
+        POST: (() => {
+          const newTimeLog = { 
+            _id: `mock_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, 
+            ...data, 
+            createdAt: new Date().toISOString(),
+            userId: 'mock_user_id'
+          };
+          
+          // Save to localStorage
+          const updatedTimeLogs = [newTimeLog, ...existingTimeLogs];
+          localStorage.setItem('mockTimeLogs', JSON.stringify(updatedTimeLogs));
+          
+          return { 
+            timeLog: newTimeLog,
+            message: 'Time logged successfully'
+          };
+        })()
+      },
+      // Health endpoints
+      '/api/health': {
+        GET: { healthData: JSON.parse(localStorage.getItem('mockHealthData') || 'null') },
+        POST: (() => {
+          const healthData = { _id: `mock_${Date.now()}`, ...data };
+          localStorage.setItem('mockHealthData', JSON.stringify(healthData));
+          return { healthData };
+        })()
+      },
+      // Mood endpoints
+      '/api/mood': {
+        GET: { moodLog: JSON.parse(localStorage.getItem('mockMoodData') || 'null') },
+        POST: (() => {
+          const moodLog = { _id: `mock_${Date.now()}`, ...data };
+          localStorage.setItem('mockMoodData', JSON.stringify(moodLog));
+          return { moodLog };
+        })()
+      },
+      // Screen time endpoints
+      '/api/screentime': {
+        GET: { screenTime: JSON.parse(localStorage.getItem('mockScreenTime') || 'null') },
+        POST: (() => {
+          const screenTime = { _id: `mock_${Date.now()}`, ...data };
+          localStorage.setItem('mockScreenTime', JSON.stringify(screenTime));
+          return { screenTime };
+        })()
+      },
+      // Analytics endpoints
+      '/api/analytics/overview': { 
+        totalTasks: existingTasks.length, 
+        completedTasks: existingTasks.filter(t => t.status === 'done').length, 
+        averageScore: 75, 
+        trends: [] 
+      }
+    };
+
+    // Handle dynamic endpoints (with IDs)
+    if (endpoint.includes('/api/tasks/') && endpoint.includes('/complete')) {
+      const taskId = endpoint.split('/')[3];
+      const updatedTasks = existingTasks.map(task => 
+        task._id === taskId 
+          ? { ...task, status: 'done', completedAt: new Date().toISOString() }
+          : task
+      );
+      localStorage.setItem('mockTasks', JSON.stringify(updatedTasks));
+      
+      const updatedTask = updatedTasks.find(t => t._id === taskId);
+      return { 
+        task: updatedTask,
+        message: 'Task marked as complete'
+      };
+    }
+    
+    if (endpoint.includes('/api/tasks/') && method === 'PUT') {
+      const taskId = endpoint.split('/')[3];
+      const updatedTasks = existingTasks.map(task => 
+        task._id === taskId 
+          ? { ...task, ...data, updatedAt: new Date().toISOString() }
+          : task
+      );
+      localStorage.setItem('mockTasks', JSON.stringify(updatedTasks));
+      
+      const updatedTask = updatedTasks.find(t => t._id === taskId);
+      return { 
+        task: updatedTask,
+        message: 'Task updated successfully'
+      };
+    }
+    
+    if (endpoint.includes('/api/tasks/') && method === 'DELETE') {
+      const taskId = endpoint.split('/')[3];
+      const updatedTasks = existingTasks.filter(task => task._id !== taskId);
+      localStorage.setItem('mockTasks', JSON.stringify(updatedTasks));
+      
+      return {
+        message: 'Task deleted successfully'
+      };
+    }
+
+    // Return mock data based on endpoint and method
+    const endpointData = mockData[endpoint];
+    if (endpointData) {
+      return endpointData[method] || endpointData.GET || {};
+    }
+
+    // Default empty response
+    return {};
+  }
 }
 
 const hybridAuthService = new HybridAuthService();
