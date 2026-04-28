@@ -127,4 +127,5 @@ class FileUploadService {
   }
 }
 
-export default new FileUploadService();
+const fileUploadService = new FileUploadService();
+export default fileUploadService;

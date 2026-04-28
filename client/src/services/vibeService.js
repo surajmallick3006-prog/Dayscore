@@ -1,5 +1,5 @@
 import { db } from '../config/firebase';
-import { collection, doc, setDoc, getDocs, query, where, orderBy, limit, deleteDoc } from 'firebase/firestore';
+import { collection, doc, setDoc, getDocs, query, where, orderBy, deleteDoc } from 'firebase/firestore';
 import { format, startOfDay, endOfDay, subDays, startOfWeek, endOfWeek } from 'date-fns';
 
 class VibeService {

@@ -473,4 +473,5 @@ class DayScoreService {
   }
 }
 
-export default new DayScoreService();
+const dayScoreService = new DayScoreService();
+export default dayScoreService;
