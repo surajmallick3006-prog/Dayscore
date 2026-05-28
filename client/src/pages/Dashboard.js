@@ -13,6 +13,7 @@ import DistractionAlerts from '../components/DistractionAlerts';
 import AIInsights from '../components/AIInsights';
 import HoroscopeManager from '../components/HoroscopeManager';
 import DailyCheckIn from '../components/DailyCheckIn';
+import WellnessHubPromoCard from '../components/wellness/WellnessHubPromoCard';
 import dayScoreService from '../services/dayScoreService';
 import toast from 'react-hot-toast';
 
@@ -857,6 +858,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* LEFT COLUMN */}
             <div className="space-y-6">
+              <WellnessHubPromoCard />
               <HoroscopeManager />
               <SleepChart healthData={healthData} />
               <MoodSlider moodData={moodData} />

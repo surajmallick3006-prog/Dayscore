@@ -1,0 +1,644 @@
+/* Women's Wellness Hub — scoped under .wellness-hub */
+.wellness-hub {
+  --wh-bg: #f9fafb;
+  --wh-surface: #ffffff;
+  --wh-surface2: #f3f4f6;
+  --wh-border: #e5e7eb;
+  --wh-border-light: #f3f4f6;
+  --wh-text: #111827;
+  --wh-text-muted: #6b7280;
+  --wh-text-light: #9ca3af;
+  --wh-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --wh-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --wh-accent: #6366f1;
+  margin: -1.5rem;
+  min-height: calc(100vh - 8rem);
+  background: var(--wh-bg);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.wellness-hub .wellness-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #be185d 0%, #9333ea 40%, #6366f1 80%, #3b82f6 100%);
+  color: #fff;
+}
+
+.wellness-hub .wellness-hero-bg {
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='40' cy='40' r='30'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.wellness-hub .wellness-hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 36px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.wellness-hub .wellness-hero-tag {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+  margin-bottom: 10px;
+}
+
+.wellness-hub .wellness-hero-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.wellness-hub .wellness-hero-desc {
+  font-size: 0.88rem;
+  opacity: 0.85;
+  line-height: 1.6;
+  max-width: 420px;
+}
+
+.wellness-hub .phase-hero-badge {
+  flex-shrink: 0;
+  padding: 16px 20px;
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  min-width: 220px;
+}
+
+.wellness-hub .phb-phase { font-size: 1rem; font-weight: 800; margin-bottom: 4px; }
+.wellness-hub .phb-day { font-size: 0.78rem; opacity: 0.85; margin-bottom: 4px; }
+.wellness-hub .phb-hormone { font-size: 0.72rem; opacity: 0.7; font-style: italic; }
+
+.wellness-hub .wellness-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--wh-surface);
+  border-bottom: 1px solid var(--wh-border);
+  padding: 8px 32px 0;
+  overflow-x: auto;
+}
+
+.wellness-hub .wtab {
+  padding: 10px 18px;
+  border: none;
+  background: none;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--wh-text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  font-family: inherit;
+}
+
+.wellness-hub .wtab:hover { color: #be185d; }
+.wellness-hub .wtab.active { color: #be185d; border-bottom-color: #be185d; }
+
+.wellness-hub .wellness-body {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 32px 80px;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+}
+
+.wellness-hub .wcard {
+  background: var(--wh-surface);
+  border: 1px solid var(--wh-border);
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 20px;
+  box-shadow: var(--wh-shadow);
+  transition: box-shadow 0.2s;
+}
+
+.wellness-hub .wcard:hover { box-shadow: var(--wh-shadow-md); }
+
+.wellness-hub .wcard-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--wh-text-muted);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wellness-hub .wcard-title::before {
+  content: '';
+  width: 3px;
+  height: 14px;
+  background: linear-gradient(#be185d, #9333ea);
+  border-radius: 2px;
+}
+
+.wellness-hub .info-box {
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid;
+  font-size: 0.83rem;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.wellness-hub .info-blue { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+.wellness-hub .info-pink { background: #fdf2f8; border-color: #f9a8d4; color: #9d174d; }
+
+.wellness-hub .setup-prompt { text-align: center; padding: 24px 16px; }
+.wellness-hub .setup-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.wellness-hub .setup-prompt p {
+  font-size: 0.88rem;
+  color: var(--wh-text-muted);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.wellness-hub .cycle-ring-wrap {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  margin: 0 auto 20px;
+}
+
+.wellness-hub .cycle-svg { width: 100%; height: 100%; }
+
+.wellness-hub .cycle-ring-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.wellness-hub .cycle-day-num { font-size: 2rem; font-weight: 900; color: var(--wh-text); line-height: 1; }
+.wellness-hub .cycle-phase-name { font-size: 0.8rem; font-weight: 700; color: var(--wh-text-muted); margin-top: 3px; }
+.wellness-hub .cycle-days-left { font-size: 0.7rem; color: var(--wh-text-light); margin-top: 3px; }
+
+.wellness-hub .phase-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.wellness-hub .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  color: var(--wh-text-muted);
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--wh-border);
+}
+
+.wellness-hub .legend-item.active {
+  background: var(--wh-surface2);
+  font-weight: 700;
+  color: var(--wh-text);
+}
+
+.wellness-hub .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.wellness-hub .phase-cal-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--wh-surface2);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.wellness-hub .phase-cal-item.phase-cal-active { background: #fdf2f8; }
+.wellness-hub .phase-cal-emoji { font-size: 1.3rem; }
+.wellness-hub .phase-cal-name { font-size: 0.85rem; font-weight: 700; color: var(--wh-text); display: flex; align-items: center; gap: 6px; }
+.wellness-hub .phase-cal-date { font-size: 0.72rem; color: var(--wh-text-muted); margin-top: 2px; }
+
+.wellness-hub .now-badge {
+  background: #be185d;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.wellness-hub .phase-today-big { font-size: 3rem; text-align: center; margin-bottom: 8px; }
+.wellness-hub .phase-today-name { font-size: 1.3rem; font-weight: 900; text-align: center; margin-bottom: 10px; }
+.wellness-hub .phase-today-desc {
+  font-size: 0.85rem;
+  color: var(--wh-text-muted);
+  line-height: 1.7;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.wellness-hub .phase-today-stats { display: flex; gap: 8px; }
+.wellness-hub .pts-stat {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  border: 1px solid var(--wh-border);
+}
+
+.wellness-hub .pts-stat-val { font-size: 0.88rem; font-weight: 800; color: var(--wh-text); }
+.wellness-hub .pts-stat-label {
+  font-size: 0.65rem;
+  color: var(--wh-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+
+.wellness-hub .hormone-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.wellness-hub .hormone-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1.5px solid;
+  background: #fff;
+}
+
+.wellness-hub .hormone-effect { font-size: 0.84rem; color: var(--wh-text-muted); line-height: 1.7; }
+
+.wellness-hub .wellness-quick-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.wellness-hub .wqs-card {
+  background: var(--wh-surface2);
+  border: 1px solid var(--wh-border);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+
+.wellness-hub .wqs-icon { font-size: 1.3rem; margin-bottom: 4px; }
+.wellness-hub .wqs-val { font-size: 1.3rem; font-weight: 900; color: #be185d; }
+.wellness-hub .wqs-label {
+  font-size: 0.65rem;
+  color: var(--wh-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.wellness-hub .phase-explainer { display: flex; flex-direction: column; gap: 12px; }
+.wellness-hub .phase-exp-item { padding: 14px 16px; background: var(--wh-surface2); border-radius: 10px; }
+.wellness-hub .phase-exp-header { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; margin-bottom: 6px; }
+.wellness-hub .phase-exp-header span { font-size: 1.1rem; }
+.wellness-hub .phase-exp-item p { font-size: 0.82rem; color: var(--wh-text-muted); line-height: 1.6; }
+
+.wellness-hub .wellness-boost-badge {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.wellness-hub .boost-val { font-size: 2rem; font-weight: 900; line-height: 1; }
+.wellness-hub .boost-label { font-size: 0.85rem; font-weight: 700; color: var(--wh-text); }
+.wellness-hub .boost-reason { font-size: 0.84rem; color: var(--wh-text-muted); line-height: 1.6; margin-bottom: 10px; }
+.wellness-hub .boost-tip {
+  padding: 10px 14px;
+  background: #f0f4ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: var(--wh-accent);
+  font-weight: 500;
+}
+
+.wellness-hub .nutrition-item {
+  padding: 12px 14px;
+  background: var(--wh-surface2);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  border-left: 3px solid #be185d;
+}
+
+.wellness-hub .nutrition-item-name { font-size: 0.88rem; font-weight: 700; color: var(--wh-text); margin-bottom: 3px; }
+.wellness-hub .nutrition-item-detail { font-size: 0.78rem; color: var(--wh-text-muted); line-height: 1.5; }
+.wellness-hub .avoid-item {
+  padding: 8px 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: #991b1b;
+  margin-bottom: 6px;
+}
+
+.wellness-hub .hydration-text,
+.wellness-hub .recovery-text {
+  font-size: 0.85rem;
+  color: var(--wh-text-muted);
+  line-height: 1.7;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.wellness-hub .hydration-text { background: #eff6ff; border: 1px solid #bfdbfe; }
+.wellness-hub .recovery-text { background: #f0fdf4; border: 1px solid #bbf7d0; }
+
+.wellness-hub .nutrient-item {
+  padding: 12px 14px;
+  background: var(--wh-surface2);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.wellness-hub .nutrient-name { font-size: 0.88rem; font-weight: 700; color: var(--wh-text); margin-bottom: 3px; }
+.wellness-hub .nutrient-why { font-size: 0.78rem; color: var(--wh-text-muted); margin-bottom: 3px; }
+.wellness-hub .nutrient-sources { font-size: 0.72rem; color: #be185d; font-weight: 600; }
+
+.wellness-hub .workout-item {
+  padding: 12px 14px;
+  background: var(--wh-surface2);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.wellness-hub .workout-type { font-size: 0.88rem; font-weight: 700; color: var(--wh-text); margin-bottom: 4px; }
+.wellness-hub .workout-intensity {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.wellness-hub .intensity-low,
+.wellness-hub .intensity-low-moderate { background: #d1fae5; color: #065f46; }
+.wellness-hub .intensity-moderate,
+.wellness-hub .intensity-moderate-high { background: #fef3c7; color: #92400e; }
+.wellness-hub .intensity-high,
+.wellness-hub .intensity-very-high { background: #fee2e2; color: #991b1b; }
+.wellness-hub .intensity-none { background: #f3f4f6; color: var(--wh-text-muted); }
+.wellness-hub .workout-benefit { font-size: 0.78rem; color: var(--wh-text-muted); line-height: 1.5; }
+
+.wellness-hub .wellness-tip,
+.wellness-hub .affirmation-item {
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #fdf2f8, #faf5ff);
+  border: 1px solid #f9a8d4;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  color: var(--wh-text-muted);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.wellness-hub .affirmation-item {
+  font-size: 0.88rem;
+  font-style: italic;
+  color: #9d174d;
+  font-weight: 600;
+  text-align: center;
+}
+
+.wellness-hub .selfcare-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+  color: var(--wh-text-muted);
+  border: 1px solid var(--wh-border);
+  margin-bottom: 8px;
+  background: var(--wh-surface2);
+}
+
+.wellness-hub .selfcare-item:hover { border-color: #be185d; background: #fdf2f8; }
+.wellness-hub .selfcare-item.done {
+  opacity: 0.6;
+  text-decoration: line-through;
+  background: #f0fdf4;
+  border-color: #6ee7b7;
+}
+
+.wellness-hub .selfcare-check {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--wh-border);
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wellness-hub .selfcare-check.checked { background: #10b981; border-color: #10b981; }
+.wellness-hub .selfcare-check.checked::after {
+  content: '✓';
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.wellness-hub .mood-log-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.wellness-hub .mood-log-item {
+  text-align: center;
+  padding: 10px 6px;
+  border: 1.5px solid var(--wh-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.72rem;
+  color: var(--wh-text-muted);
+  font-weight: 600;
+}
+
+.wellness-hub .mood-log-item span { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+.wellness-hub .mood-log-item:hover { border-color: #be185d; background: #fdf2f8; }
+.wellness-hub .mood-log-item.active {
+  border-color: #be185d;
+  background: linear-gradient(135deg, #fdf2f8, #faf5ff);
+  color: #9d174d;
+}
+
+.wellness-hub .mood-log-note {
+  font-size: 0.78rem;
+  color: #9d174d;
+  font-weight: 600;
+  padding: 6px 12px;
+  background: #fdf2f8;
+  border-radius: 8px;
+}
+
+.wellness-hub .symptom-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.wellness-hub .sym-tag {
+  background: var(--wh-surface2);
+  border: 1.5px solid var(--wh-border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--wh-text-muted);
+  font-weight: 500;
+}
+
+.wellness-hub .sym-tag:hover { border-color: #be185d; color: #9d174d; background: #fdf2f8; }
+.wellness-hub .sym-tag.active {
+  background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+  border-color: #be185d;
+  color: #9d174d;
+  font-weight: 700;
+}
+
+.wellness-hub .log-history-item { padding: 10px 0; border-bottom: 1px solid var(--wh-border-light); }
+.wellness-hub .log-history-item:last-child { border-bottom: none; }
+.wellness-hub .log-history-date { font-size: 0.78rem; font-weight: 700; color: var(--wh-text); margin-bottom: 4px; }
+.wellness-hub .log-history-detail { display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.72rem; color: var(--wh-text-muted); }
+
+.wellness-hub .doctor-intro { font-size: 0.85rem; color: var(--wh-text-muted); margin-bottom: 12px; line-height: 1.6; }
+.wellness-hub .doctor-list { padding-left: 18px; display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.wellness-hub .doctor-list li { font-size: 0.83rem; color: var(--wh-text-muted); line-height: 1.5; }
+
+.wellness-hub .wform-group { margin-bottom: 16px; }
+.wellness-hub .wform-group label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--wh-text-muted);
+  margin-bottom: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.wellness-hub .wform-group input[type='date'] {
+  width: 100%;
+  background: var(--wh-surface2);
+  border: 1.5px solid var(--wh-border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--wh-text);
+  font-size: 0.9rem;
+  outline: none;
+  font-family: inherit;
+}
+
+.wellness-hub .wform-group input[type='date']:focus { border-color: #be185d; }
+.wellness-hub .field-hint { font-size: 0.72rem; color: var(--wh-text-light); margin-top: 4px; display: block; }
+
+.wellness-hub .stepper-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.wellness-hub .stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--wh-surface2);
+  border-radius: 10px;
+  padding: 4px;
+  border: 1px solid var(--wh-border);
+}
+
+.wellness-hub .stepper button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #be185d;
+}
+
+.wellness-hub .stepper span { min-width: 28px; text-align: center; font-weight: 800; }
+.wellness-hub .stepper-unit { font-size: 0.78rem; color: var(--wh-text-muted); }
+.wellness-hub .cycle-intro { font-size: 0.85rem; color: var(--wh-text-muted); margin-bottom: 12px; }
+
+.wellness-hub .btn-wellness-save {
+  width: 100%;
+  background: linear-gradient(135deg, #be185d, #9333ea);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(190, 24, 93, 0.3);
+  font-family: inherit;
+}
+
+.wellness-hub .btn-wellness-save:hover { transform: translateY(-1px); }
+
+.wellness-hub .btn-wellness-outline {
+  width: 100%;
+  background: none;
+  border: 1.5px solid #be185d;
+  color: #be185d;
+  border-radius: 10px;
+  padding: 9px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 8px;
+}
+
+.wellness-hub .wellness-empty {
+  font-size: 0.85rem;
+  color: var(--wh-text-muted);
+  text-align: center;
+  padding: 24px;
+}
+
+.wellness-hub .phase-info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--wh-border-light);
+  font-size: 0.85rem;
+}
+
+.wellness-hub .phase-info-row:last-child { border-bottom: none; }
+.wellness-hub .phase-info-label { color: var(--wh-text-muted); }
+.wellness-hub .phase-info-val { font-weight: 700; }
+
+@media (max-width: 900px) {
+  .wellness-hub .wellness-body { grid-template-columns: 1fr; padding: 16px 16px 80px; }
+  .wellness-hub .wellness-hero-inner { flex-direction: column; padding: 24px 16px; }
+  .wellness-hub .wellness-tabs { padding: 8px 16px 0; }
+  .wellness-hub .wellness-quick-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .wellness-hub .mood-log-grid { grid-template-columns: repeat(3, 1fr); }
+  .wellness-hub .phase-today-stats { flex-direction: column; }
+  .wellness-hub .wellness-hero-title { font-size: 1.3rem; }
+}

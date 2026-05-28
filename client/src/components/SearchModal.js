@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, X, Clock, CheckSquare, Heart, Smile, TrendingUp, BarChart3, User, ArrowRight } from 'lucide-react';
+import { Search, X, Clock, CheckSquare, Heart, Smile, TrendingUp, BarChart3, User, ArrowRight, Flower2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 
@@ -18,6 +18,7 @@ const SearchModal = ({ isOpen, onClose }) => {
     { name: 'Time Tracker', path: '/app/time-tracker', icon: Clock, color: 'text-orange-400', description: 'Track study and work sessions' },
     { name: 'Health & Activity', path: '/app/health', icon: Heart, color: 'text-green-500', description: 'Monitor sleep, activity, and water intake' },
     { name: 'Mood & Wellness', path: '/app/mood', icon: Smile, color: 'text-purple-500', description: 'Log your emotional state and wellness' },
+    { name: "Women's Wellness Hub", path: '/app/wellness-hub', icon: Flower2, color: 'text-pink-600', description: 'Cycle tracking, phase-based nutrition, fitness & daily log' },
     { name: 'Analytics', path: '/app/analytics', icon: TrendingUp, color: 'text-blue-500', description: 'View reports and trends' },
     { name: 'Profile', path: '/app/profile', icon: User, color: 'text-pink-500', description: 'Manage your account settings' },
   ];
@@ -98,6 +99,7 @@ const SearchModal = ({ isOpen, onClose }) => {
       { query: ['day score', 'score', 'daily'], title: 'Day Score', subtitle: 'View your daily productivity score', path: '/app/dashboard', icon: BarChart3, color: 'text-green-500' },
       { query: ['productivity', 'productive'], title: 'Productivity Tracking', subtitle: 'Tasks and time management', path: '/app/tasks', icon: CheckSquare, color: 'text-orange-500' },
       { query: ['wellness', 'mental health'], title: 'Wellness Tracking', subtitle: 'Mood and mental health monitoring', path: '/app/mood', icon: Smile, color: 'text-purple-500' },
+      { query: ['cycle', 'period', 'menstrual', 'ovulation', 'luteal', 'follicular', 'women', 'feminine', 'hormone'], title: "Women's Wellness Hub", subtitle: 'Cycle-aware wellness, nutrition, fitness & mindset', path: '/app/wellness-hub', icon: Flower2, color: 'text-pink-600' },
       { query: ['health', 'fitness'], title: 'Health Monitoring', subtitle: 'Sleep, activity, and wellness metrics', path: '/app/health', icon: Heart, color: 'text-green-500' },
       { query: ['sleep', 'rest'], title: 'Sleep Tracking', subtitle: 'Monitor your sleep patterns and quality', path: '/app/health', icon: Heart, color: 'text-green-500' },
       { query: ['water', 'hydration', 'drink'], title: 'Water Intake', subtitle: 'Track daily hydration goals', path: '/app/health', icon: Heart, color: 'text-green-500' },

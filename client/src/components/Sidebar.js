@@ -11,7 +11,8 @@ import {
   Home,
   LogOut,
   Sparkles,
-  Users
+  Users,
+  Flower2
 } from 'lucide-react';
 import clsx from 'clsx';
 import Logo from './Logo';
@@ -23,6 +24,7 @@ const navigation = [
   { name: 'Time Tracker', href: '/app/time-tracker', icon: Clock, color: 'text-orange-400' },
   { name: 'Health & Activity', href: '/app/health', icon: Heart, color: 'text-green-500' },
   { name: 'Mood & Wellness', href: '/app/mood', icon: Smile, color: 'text-purple-500' },
+  { name: "Women's Wellness Hub", href: '/app/wellness-hub', icon: Flower2, color: 'text-pink-600' },
   { name: 'Daily Horoscope', href: '/app/horoscope', icon: Sparkles, color: 'text-indigo-500' },
   { name: 'Community', href: '/app/community', icon: Users, color: 'text-purple-500' },
   { name: 'Analytics', href: '/app/analytics', icon: TrendingUp, color: 'text-blue-500' },

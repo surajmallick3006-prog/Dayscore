@@ -27,6 +27,7 @@ import ProfilePage from './pages/ProfilePage';
 import HoroscopePage from './pages/HoroscopePage';
 import VibePage from './pages/VibePage';
 import CommunityPage from './pages/CommunityPage';
+import WomensWellnessHubPage from './pages/WomensWellnessHubPage';
 
 function App() {
   return (
@@ -82,6 +83,7 @@ function App() {
                   <Route path="sleep-duration" element={<SleepDurationPage />} />
                   <Route path="physical-activity" element={<PhysicalActivityPage />} />
                   <Route path="mood" element={<MoodPage />} />
+                  <Route path="wellness-hub" element={<WomensWellnessHubPage />} />
                   <Route path="analytics" element={<AnalyticsPage />} />
                   <Route path="horoscope" element={<HoroscopePage />} />
                   <Route path="vibes" element={<VibePage />} />
