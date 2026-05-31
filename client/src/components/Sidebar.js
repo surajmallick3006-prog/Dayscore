@@ -35,8 +35,9 @@ const Sidebar = ({ open, setOpen }) => {
   const location = useLocation();
   const { logout } = useServerAuth();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    setOpen(false);
+    await logout();
   };
 
   const SidebarContent = () => (

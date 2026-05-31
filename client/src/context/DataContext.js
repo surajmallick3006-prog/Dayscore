@@ -94,8 +94,9 @@ export const DataProvider = ({ children }) => {
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
-          toast.error('Session expired. Please login again.');
+          toast.error('Session expired. Please sign in again.');
           hybridAuthService.logout();
+          window.location.replace('/');
         }
         return Promise.reject(error);
       }
@@ -114,8 +115,9 @@ export const DataProvider = ({ children }) => {
   const handleApiError = (error, defaultMessage) => {
     console.error(defaultMessage, error);
     if (error.response?.status === 401) {
-      toast.error('Session expired. Please login again.');
+      toast.error('Session expired. Please sign in again.');
       hybridAuthService.logout();
+      window.location.replace('/');
     }
     // Removed toast.error for other errors to avoid cluttering the UI
     // since we're using mock data and these errors are expected

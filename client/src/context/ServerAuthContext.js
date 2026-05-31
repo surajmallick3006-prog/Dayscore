@@ -215,6 +215,7 @@ export const ServerAuthProvider = ({ children }) => {
       if (result.success) {
         dispatch({ type: 'CLEAR_USER' });
         toast.success('Logged out successfully');
+        window.location.replace('/');
       }
     } catch (error) {
       toast.error('Logout failed');
