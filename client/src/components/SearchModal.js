@@ -188,10 +188,10 @@ const SearchModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex min-h-screen items-start justify-center p-4 pt-16">
-        <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={onClose} />
-        
-        <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl">
+      <div className="flex min-h-[100dvh] items-start sm:items-center justify-center p-2 sm:p-4 pt-4 sm:pt-16">
+        <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={onClose} aria-hidden />
+
+        <div className="relative w-full max-w-2xl bg-white rounded-xl sm:rounded-2xl shadow-2xl max-h-[calc(100dvh-1rem)] flex flex-col">
           {/* Search Input */}
           <div className="flex items-center border-b border-gray-200 p-4">
             <Search className="h-6 w-6 text-gray-400 mr-3" />
@@ -213,7 +213,7 @@ const SearchModal = ({ isOpen, onClose }) => {
           </div>
 
           {/* Search Results */}
-          <div className="max-h-96 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto max-h-[min(24rem,calc(100dvh-12rem))] sm:max-h-96">
             {searchResults.length > 0 ? (
               <div className="p-2">
                 <div className="text-xs font-medium text-gray-500 uppercase tracking-wide px-3 py-2">
@@ -287,14 +287,14 @@ const SearchModal = ({ isOpen, onClose }) => {
           </div>
 
           {/* Footer */}
-          <div className="border-t border-gray-200 px-4 py-3 bg-gray-50 rounded-b-2xl">
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <div className="flex items-center gap-x-4">
+          <div className="border-t border-gray-200 px-3 sm:px-4 py-3 bg-gray-50 rounded-b-xl sm:rounded-b-2xl shrink-0">
+            <div className="flex flex-col xs:flex-row items-center justify-between gap-2 text-xs text-gray-500">
+              <div className="flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-4">
                 <span>↑↓ Navigate</span>
                 <span>↵ Select</span>
                 <span>Esc Close</span>
               </div>
-              <span>Powered by DayScore Search</span>
+              <span className="hidden sm:inline">Powered by DayScore Search</span>
             </div>
           </div>
         </div>

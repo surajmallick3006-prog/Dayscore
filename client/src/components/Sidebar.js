@@ -102,7 +102,7 @@ const Sidebar = ({ open, setOpen }) => {
             className="fixed inset-0 bg-gray-900/80"
             onClick={() => setOpen(false)}
           />
-          <div className="fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-2xl">
+          <div className="fixed inset-y-0 left-0 z-50 w-[min(100vw,20rem)] sm:w-80 bg-white shadow-2xl">
             <div className="flex h-full flex-col">
               <div className="flex h-20 items-center justify-between px-6 border-b border-gray-100">
                 <div className="flex items-center space-x-3">

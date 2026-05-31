@@ -2,18 +2,76 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Design tokens (mobile-first) ───────────────────────────── */
+:root {
+  --ds-bg: #f9fafb;
+  --ds-surface: #ffffff;
+  --ds-text: #111827;
+  --ds-text-muted: #6b7280;
+  --ds-primary: #0ea5e9;
+  --ds-primary-dark: #0284c7;
+  --ds-radius: 0.75rem;
+  --ds-radius-lg: 1rem;
+  --ds-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --ds-header-h: 4rem;
+  --ds-section-py: 3rem;
+  --ds-container-px: 1rem;
+}
+
+@media (min-width: 576px) {
+  :root {
+    --ds-section-py: 3.5rem;
+    --ds-container-px: 1.25rem;
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --ds-header-h: 5rem;
+    --ds-section-py: 4rem;
+    --ds-container-px: 1.5rem;
+  }
+}
+
+@media (min-width: 992px) {
+  :root {
+    --ds-section-py: 5rem;
+    --ds-container-px: 2rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --ds-container-px: 2.5rem;
+  }
+}
+
 @layer base {
   * {
     @apply border-gray-200;
   }
-  
-  body {
-    @apply bg-gray-50 text-gray-900 font-sans;
-    font-feature-settings: "rlig" 1, "calt" 1;
-  }
-  
+
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans antialiased;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    overflow-x: hidden;
+    min-width: 320px;
+  }
+
+  img,
+  video,
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2;
   }
 }
 
@@ -330,6 +388,52 @@
   
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Landing / marketing */
+  .section-padding {
+    padding-top: var(--ds-section-py);
+    padding-bottom: var(--ds-section-py);
+  }
+
+  .scroll-mt-nav {
+    scroll-margin-top: calc(var(--ds-header-h) + 1rem);
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    transition:
+      opacity 0.55s ease,
+      transform 0.55s ease;
+  }
+
+  .reveal.reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .input-dark {
+    @apply w-full px-4 py-3 rounded-xl border border-gray-600 bg-gray-800/80 text-white placeholder-gray-500;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow;
+  }
+
+  .feature-card {
+    @apply rounded-2xl border border-gray-700/60 bg-gray-800/40 p-6 backdrop-blur-sm;
+    @apply transition-all duration-300 hover:border-primary-500/40 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  .pricing-card {
+    @apply rounded-2xl border border-gray-700 bg-gray-800/50 p-6 sm:p-8 flex flex-col;
+    @apply transition-all duration-300 hover:border-primary-500/50;
+  }
+
+  .pricing-card-featured {
+    @apply pricing-card border-primary-500 ring-2 ring-primary-500/30 scale-[1.02] sm:scale-105;
+  }
+
+  .testimonial-card {
+    @apply rounded-2xl border border-gray-700/50 bg-gray-800/30 p-6 h-full flex flex-col;
   }
 }
 

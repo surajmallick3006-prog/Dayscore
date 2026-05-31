@@ -35,7 +35,7 @@ function App() {
       <DataProvider>
         <AIProvider>
           <Router>
-            <div className="App">
+            <div className="App overflow-x-hidden min-h-screen">
               <Toaster
                 position="top-right"
                 toastOptions={{

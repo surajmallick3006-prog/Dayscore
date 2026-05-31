@@ -200,14 +200,14 @@ const Dashboard = () => {
 
       {/* Tab Navigation */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
-        <div className="flex overflow-x-auto">
+        <div className="flex overflow-x-auto scrollbar-hide -mx-1 px-1">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                className={`flex items-center space-x-1.5 sm:space-x-2 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                   activeTab === tab.id
                     ? 'border-blue-500 text-blue-600 bg-blue-50'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -458,9 +458,9 @@ const Dashboard = () => {
               </div>
 
               {/* Task Counts */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <div className="text-3xl font-bold text-blue-600">
+              <div className="grid grid-cols-1 xs:grid-cols-3 gap-3 sm:gap-4 mb-6">
+                <div className="text-center p-3 sm:p-4 bg-blue-50 rounded-lg">
+                  <div className="text-2xl sm:text-3xl font-bold text-blue-600">
                     {tasks?.filter(t => t.status === 'todo').length || 0}
                   </div>
                   <div className="text-sm text-blue-700 font-medium">To Do</div>
@@ -711,9 +711,9 @@ const Dashboard = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-6">Task Overview</h3>
 
               {/* Task Counts */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">
+              <div className="grid grid-cols-1 xs:grid-cols-3 gap-3 sm:gap-4 mb-6">
+                <div className="text-center p-3 sm:p-4 bg-blue-50 rounded-lg">
+                  <div className="text-xl sm:text-2xl font-bold text-blue-600">
                     {tasks?.filter(t => t.status === 'todo').length || 0}
                   </div>
                   <div className="text-sm text-blue-700">To Do</div>
@@ -925,7 +925,7 @@ const Dashboard = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100">
+                      <div className="grid grid-cols-1 xs:grid-cols-3 gap-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-3 sm:p-4 border border-blue-100">
                         {[
                           { label: 'Mood', color: '#8b5cf6', textColor: 'text-purple-600', value: latestMood.mood ? latestMood.mood * 20 : components.wellness, sub: latestMood.moodEmoji || '😊' },
                           { label: 'Energy', color: '#10b981', textColor: 'text-green-600', value: latestMood.energy ? latestMood.energy * 10 : 70, sub: `${latestMood.energy || 7}/10` },

@@ -43,20 +43,18 @@ const HealthPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+    <div className="-m-3 sm:-m-4 md:-m-6 min-h-full bg-gray-100 p-4 sm:p-6 overflow-x-hidden">
+      <div className="text-center mb-6 sm:mb-8">
+        <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-2 leading-tight px-2">
           HEALTH ACTIVITIES
         </h1>
-        <div className="text-right text-gray-500 text-sm">
+        <div className="text-gray-500 text-xs sm:text-sm px-2">
           {getCurrentDate()}
         </div>
       </div>
 
-      {/* Main Cards Container */}
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="max-w-7xl mx-auto w-full min-w-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           
           {/* Sleep Duration Card */}
           <div 
