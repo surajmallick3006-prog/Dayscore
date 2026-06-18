@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DayScore – Habit Tracker</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="habits-feature.css"/>
+</head>
+<body>
+
+<div id="authLoader" class="auth-loader">
+  <div class="loader-spinner"></div>
+  <p>Loading Habit Tracker…</p>
+</div>
+
+<div id="habitsApp" style="display:none">
+
+  <!-- HEADER -->
+  <header class="profile-header">
+    <a href="app.html" class="back-btn">← Dashboard</a>
+    <div class="logo">
+      <div class="logo-icon">☀️</div>
+      <span class="logo-day">Day</span><span class="logo-score">Score</span>
+    </div>
+    <button class="btn-ghost" onclick="handleLogout()">Sign Out</button>
+  </header>
+
+  <div class="habits-page-wrap">
+
+    <!-- HERO BANNER -->
+    <div class="habits-hero">
+      <div class="habits-hero-left">
+        <div class="habits-hero-title">🔁 Habit Intelligence</div>
+        <div class="habits-hero-sub">Build powerful routines with streak tracking, analytics &amp; smart coaching</div>
+      </div>
+      <div class="habits-hero-stats" id="habitsHeroStats"></div>
+    </div>
+
+    <!-- SUB-TABS -->
+    <div class="habit-subtabs">
+      <button class="hstab active" data-hstab="tracker"   onclick="switchHabitTab('tracker',this)">📋 My Habits</button>
+      <button class="hstab"        data-hstab="heatmap"   onclick="switchHabitTab('heatmap',this)">🗓️ Heatmap</button>
+      <button class="hstab"        data-hstab="analytics" onclick="switchHabitTab('analytics',this)">📊 Analytics</button>
+      <button class="hstab"        data-hstab="library"   onclick="switchHabitTab('library',this)">📚 Habit Library</button>
+    </div>
+
+    <!-- ══ TRACKER TAB ══ -->
+    <div class="hstab-content active" id="hstab-tracker">
+      <div class="habits-layout">
+        <div class="habits-main">
+
+          <!-- Add Habit -->
+          <section class="card">
+            <div class="card-title">➕ Add New Habit</div>
+            <div class="habit-builder">
+              <div class="hb-row">
+                <input id="habitName" type="text" placeholder="e.g. Morning meditation" maxlength="60" class="hb-input"/>
+                <select id="habitCat" class="hb-select">
+                  <option value="health">🏃 Health</option>
+                  <option value="mind">🧠 Mind</option>
+                  <option value="productivity">💼 Productivity</option>
+                  <option value="wellness">🌿 Wellness</option>
+                  <option value="social">👥 Social</option>
+                  <option value="finance">💰 Finance</option>
+                </select>
+              </div>
+              <div class="hb-row">
+                <select id="habitFreq" class="hb-select">
+                  <option value="daily">📅 Every Day</option>
+                  <option value="weekdays">💼 Weekdays Only</option>
+                  <option value="weekends">🌅 Weekends Only</option>
+                  <option value="3x">3× per Week</option>
+                </select>
+                <select id="habitTime" class="hb-select">
+                  <option value="morning">🌅 Morning</option>
+                  <option value="afternoon">☀️ Afternoon</option>
+                  <option value="evening">🌙 Evening</option>
+                  <option value="anytime">⏰ Anytime</option>
+                </select>
+                <input id="habitTarget" type="number" placeholder="Target (mins)" min="1" max="480" class="hb-input-sm"/>
+                <button class="btn-add" onclick="addHabit()">+ Add Habit</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Habit List -->
+          <section class="card">
+            <div class="card-title-row">
+              <div class="card-title">📋 My Habits</div>
+              <div class="habit-filter-row" id="habitFilterRow"></div>
+            </div>
+            <div id="habitList"></div>
+          </section>
+
+        </div>
+        <div class="habits-sidebar">
+
+          <!-- Today's Progress -->
+          <section class="card habit-today-card">
+            <div class="card-title">✅ Today's Progress</div>
+            <div id="habitTodayProgress"></div>
+          </section>
+
+          <!-- Top Streaks -->
+          <section class="card">
+            <div class="card-title">🔥 Top Streaks</div>
+            <div id="habitStreakLeader"></div>
+          </section>
+
+          <!-- Smart Coaching -->
+          <section class="card habit-tip-card">
+            <div class="card-title">💡 Smart Coaching</div>
+            <div id="habitSmartTip"></div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ HEATMAP TAB ══ -->
+    <div class="hstab-content" id="hstab-heatmap">
+      <section class="card">
+        <div class="card-title-row">
+          <div class="card-title">🗓️ Habit Completion Heatmap</div>
+          <select id="heatmapHabitSelect" onchange="renderHeatmap()" class="hb-select" style="width:auto"></select>
+        </div>
+        <div class="heatmap-legend">
+          <span>Less</span>
+          <div class="hm-box hm-0"></div>
+          <div class="hm-box hm-1"></div>
+          <div class="hm-box hm-2"></div>
+          <div class="hm-box hm-3"></div>
+          <div class="hm-box hm-4"></div>
+          <span>More</span>
+        </div>
+        <div class="heatmap-wrap" id="heatmapWrap"></div>
+        <div class="heatmap-months" id="heatmapMonths"></div>
+      </section>
+    </div>
+
+    <!-- ══ ANALYTICS TAB ══ -->
+    <div class="hstab-content" id="hstab-analytics">
+      <div class="habits-layout">
+        <div class="habits-main">
+          <section class="card">
+            <div class="card-title">📈 Habit Performance</div>
+            <div id="habitPerformance"></div>
+          </section>
+          <section class="card">
+            <div class="card-title">📊 Weekly Completion Rate</div>
+            <div class="habit-weekly-chart" id="habitWeeklyChart"></div>
+          </section>
+        </div>
+        <div class="habits-sidebar">
+          <section class="card">
+            <div class="card-title">🏆 Habit Achievements</div>
+            <div id="habitAchievements"></div>
+          </section>
+          <section class="card">
+            <div class="card-title">🧠 AI Habit Insights</div>
+            <div id="habitAIInsights"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ LIBRARY TAB ══ -->
+    <div class="hstab-content" id="hstab-library">
+      <div class="habit-library-search">
+        <input type="text" id="librarySearch" placeholder="🔍 Search habits…" oninput="filterLibrary(this.value)"/>
+        <div class="library-cats" id="libraryCats"></div>
+      </div>
+      <div class="habit-library-grid" id="habitLibraryGrid"></div>
+    </div>
+
+  </div><!-- /habits-page-wrap -->
+</div><!-- /habitsApp -->
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="auth.js"></script>
+<script src="habits-feature.js"></script>
+<script>
+  // ── Bootstrap ───────────────────────────────────────────────────────────
+  const SESSION_KEY = 'fs_session';
+  let currentSession = null;
+  let habits = [];
+  const TODAY = new Date().toLocaleDateString('en-CA');
+
+  function sk(k) { return `fs_${currentSession.uid}_${k}`; }
+  function saveHabits() { localStorage.setItem(sk('habits'), JSON.stringify(habits)); }
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast'; t.textContent = msg;
+    document.getElementById('toastContainer').appendChild(t);
+    setTimeout(() => t.classList.add('show'), 10);
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
+  }
+  function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    currentSession = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+    if (!currentSession) { window.location.href = 'index.html'; return; }
+    habits = JSON.parse(localStorage.getItem(sk('habits')) || '[]');
+    document.getElementById('authLoader').style.display = 'none';
+    document.getElementById('habitsApp').style.display  = 'block';
+    renderHabits();
+  });
+
+  window.handleLogout = function() { localStorage.removeItem(SESSION_KEY); window.location.href = 'index.html'; };
+</script>
+</body>
+</html>

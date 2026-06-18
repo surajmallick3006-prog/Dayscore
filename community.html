@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DayScore – Community</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="community-feature.css"/>
+</head>
+<body>
+
+<div id="authLoader" class="auth-loader">
+  <div class="loader-spinner"></div>
+  <p>Loading Community…</p>
+</div>
+
+<div id="communityApp" style="display:none">
+
+  <!-- HEADER -->
+  <header class="profile-header">
+    <a href="app.html" class="back-btn">← Dashboard</a>
+    <div class="logo">
+      <div class="logo-icon">☀️</div>
+      <span class="logo-day">Day</span><span class="logo-score">Score</span>
+    </div>
+    <button class="btn-ghost" onclick="handleLogout()">Sign Out</button>
+  </header>
+
+  <div class="community-page-wrap">
+
+    <!-- HERO BANNER -->
+    <div class="community-hero">
+      <div class="community-hero-bg"></div>
+      <div class="community-hero-inner">
+        <div class="community-hero-left">
+          <div class="community-hero-tag">👥 DayScore Community</div>
+          <h2 class="community-hero-title">Grow Together, Achieve More</h2>
+          <p class="community-hero-desc">Connect with productivity champions, compete on leaderboards, join challenges, and celebrate wins together.</p>
+        </div>
+        <div class="community-hero-stats" id="communityHeroStats"></div>
+      </div>
+    </div>
+
+    <!-- SUB-TABS -->
+    <div class="community-subtabs">
+      <button class="cstab active" data-cstab="leaderboard" onclick="switchCommunityTab('leaderboard',this)">🏆 Leaderboard</button>
+      <button class="cstab"        data-cstab="challenges"  onclick="switchCommunityTab('challenges',this)">⚡ Challenges</button>
+      <button class="cstab"        data-cstab="feed"        onclick="switchCommunityTab('feed',this)">📢 Feed</button>
+      <button class="cstab"        data-cstab="members"     onclick="switchCommunityTab('members',this)">👤 Members</button>
+    </div>
+
+    <!-- ══ LEADERBOARD TAB ══ -->
+    <div class="cstab-content active" id="cstab-leaderboard">
+      <div class="community-layout">
+        <div class="community-main">
+
+          <!-- Your Rank Banner -->
+          <div class="your-rank-banner" id="yourRankBanner"></div>
+
+          <!-- Leaderboard -->
+          <section class="card">
+            <div class="card-title-row">
+              <div class="card-title">🏆 Leaderboard</div>
+              <div class="lb-filter">
+                <button class="lb-btn active" onclick="switchLeaderboard('today',this)">Today</button>
+                <button class="lb-btn"        onclick="switchLeaderboard('week',this)">This Week</button>
+                <button class="lb-btn"        onclick="switchLeaderboard('alltime',this)">All Time</button>
+              </div>
+            </div>
+            <div id="leaderboard"></div>
+          </section>
+
+        </div>
+        <div class="community-sidebar">
+
+          <section class="card">
+            <div class="card-title">📊 Score Comparison</div>
+            <div id="scoreComparison"></div>
+          </section>
+
+          <section class="card">
+            <div class="card-title">🔥 Trending Habits</div>
+            <div id="trendingHabits"></div>
+          </section>
+
+          <section class="card">
+            <div class="card-title">📤 Share Your Score</div>
+            <div class="share-preview" id="sharePreview"></div>
+            <button class="btn-share" onclick="shareScore()">📋 Copy Score Card</button>
+          </section>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CHALLENGES TAB ══ -->
+    <div class="cstab-content" id="cstab-challenges">
+      <div class="challenges-grid" id="challengesGrid"></div>
+    </div>
+
+    <!-- ══ FEED TAB ══ -->
+    <div class="cstab-content" id="cstab-feed">
+      <div class="community-layout">
+        <div class="community-main">
+
+          <section class="card">
+            <div class="card-title">✍️ Share with Community</div>
+            <div class="post-composer">
+              <div class="post-composer-avatar" id="postComposerAvatar"></div>
+              <div class="post-composer-right">
+                <textarea id="postInput" placeholder="Share a win, tip, or motivation…" rows="2" maxlength="200"></textarea>
+                <div class="post-composer-actions">
+                  <div class="post-tags">
+                    <button class="post-tag-btn active" data-tag="win"        onclick="selectPostTag(this)">🏆 Win</button>
+                    <button class="post-tag-btn"        data-tag="tip"        onclick="selectPostTag(this)">💡 Tip</button>
+                    <button class="post-tag-btn"        data-tag="motivation" onclick="selectPostTag(this)">🔥 Motivation</button>
+                    <button class="post-tag-btn"        data-tag="question"   onclick="selectPostTag(this)">❓ Question</button>
+                  </div>
+                  <button class="btn-post" onclick="submitPost()">Post</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-title">📢 Community Feed</div>
+            <div id="communityFeed"></div>
+          </section>
+
+        </div>
+        <div class="community-sidebar">
+          <section class="card">
+            <div class="card-title">🌟 Top Contributors</div>
+            <div id="topContributors"></div>
+          </section>
+          <section class="card">
+            <div class="card-title">💬 Community Tips</div>
+            <div id="communityTips"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MEMBERS TAB ══ -->
+    <div class="cstab-content" id="cstab-members">
+      <div class="members-search-row">
+        <input type="text" id="memberSearch" placeholder="🔍 Search members…" oninput="filterMembers(this.value)"/>
+        <select id="memberSort" onchange="sortMembers(this.value)">
+          <option value="score">Sort by Score</option>
+          <option value="streak">Sort by Streak</option>
+          <option value="name">Sort by Name</option>
+        </select>
+      </div>
+      <div class="members-grid" id="membersGrid"></div>
+    </div>
+
+  </div><!-- /community-page-wrap -->
+</div><!-- /communityApp -->
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="auth.js"></script>
+<script src="community-feature.js"></script>
+<script>
+  // ── Bootstrap ───────────────────────────────────────────────────────────
+  const SESSION_KEY = 'fs_session';
+  let currentSession = null;
+  let tasks   = [];
+  let habits  = [];
+  let history = {};
+  const TODAY = new Date().toLocaleDateString('en-CA');
+
+  // Grades used by share card
+  const GRADES = [
+    { min:90, label:'Exceptional ⭐', color:'#f59e0b' },
+    { min:75, label:'Excellent 🚀',   color:'#6366f1' },
+    { min:60, label:'Good 💪',        color:'#10b981' },
+    { min:45, label:'Average 📈',     color:'#06b6d4' },
+    { min:0,  label:'Needs Work 🌱',  color:'#94a3b8' },
+  ];
+
+  function sk(k) { return `fs_${currentSession.uid}_${k}`; }
+
+  function calcScore() {
+    // Lightweight score calculation for standalone community page
+    const completedTasks = tasks.filter(t => t.completed).length;
+    const total = Math.min(100, completedTasks * 10 + habits.filter(h => h.completedDates?.includes(TODAY)).length * 5);
+    return { total };
+  }
+
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast'; t.textContent = msg;
+    document.getElementById('toastContainer').appendChild(t);
+    setTimeout(() => t.classList.add('show'), 10);
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
+  }
+
+  function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    currentSession = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+    if (!currentSession) { window.location.href = 'index.html'; return; }
+    tasks   = JSON.parse(localStorage.getItem(sk('tasks_'   + TODAY)) || '[]');
+    habits  = JSON.parse(localStorage.getItem(sk('habits'))            || '[]');
+    history = JSON.parse(localStorage.getItem(sk('history'))           || '{}');
+    document.getElementById('authLoader').style.display   = 'none';
+    document.getElementById('communityApp').style.display = 'block';
+    renderCommunity();
+  });
+
+  window.handleLogout = function() { localStorage.removeItem(SESSION_KEY); window.location.href = 'index.html'; };
+</script>
+</body>
+</html>
